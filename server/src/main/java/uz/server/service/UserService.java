@@ -30,21 +30,13 @@ public class UserService {
     }
 
     public void authorize(String token) {
-        log.info("Authorizing user with token: {}", token);
-
-        User user = getByToken(token);
-
-        if (Objects.isNull(user)){
-            log.error("Token is incorrect, please check your token and try again!");
-            throw new BaseException("Token is incorrect, please check your token and try again!");
-        }
+        User user = authorizeSessionWithToken(token);
 
         if (user.getConnectedToCLI()) {
-            log.error("User already connected to CLI!");
+            log.error("User's token already connected to CLI!");
             throw new BaseException("User already connected to CLI!");
         }
 
-        log.info("User authorized: userId={}", user.getId());
         user.setConnectedToCLI(true);
         repo.save(user);
     }
