@@ -2,10 +2,6 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/cli.iml" filepath="$PROJECT_DIR$/cli.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/cli.main.iml" filepath="$PROJECT_DIR$/.idea/modules/cli.main.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/cli.test.iml" filepath="$PROJECT_DIR$/.idea/modules/cli.test.iml" />
-      <module fileurl="file://$PROJECT_DIR$/server/server.iml" filepath="$PROJECT_DIR$/server/server.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/tarmoqchi.iml" filepath="$PROJECT_DIR$/.idea/tarmoqchi.iml" />
     </modules>
   </component>

@@ -21,16 +21,11 @@ import java.util.Map;
 public class ForwardController {
     private final Forwarder forwarder;
 
-    @RequestMapping(value = "/**", headers = {"Upgrade!=websocket"})
+    @RequestMapping(value = "/**", headers = {"Upgrade!=websocket", "x-subdomain=*"})
     public ResponseEntity<String> handleRequest(
             @RequestBody(required = false) String body,
             HttpServletRequest servletRequest) {
         String subdomain = servletRequest.getHeader("x-subdomain");
-
-        if (subdomain == null) {
-            log.error("Subdomain not found in headers");
-            return ResponseEntity.badRequest().body("Subdomain not found in headers");
-        }
 
         String requestUri = servletRequest.getRequestURI();
 
