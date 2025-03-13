@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Gradle Imported" enabled="true">
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/info.picocli/picocli-codegen/4.7.5/d704218e5721b779c0286f7455c689924983103c/picocli-codegen-4.7.5.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/info.picocli/picocli/4.7.5/a6f99ec0a97aeb3be63a9f55703b28f2cf08788f/picocli-4.7.5.jar" />
+        </processorPath>
+        <module name="cli.main" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="cli" target="17" />
+      <module name="cli.main" target="17" />
+      <module name="cli.test" target="17" />
+    </bytecodeTargetLevel>
+  </component>
+</project>

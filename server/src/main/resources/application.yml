@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: server
+  datasource:
+    url: jdbc:postgresql://10.144.10.10:5432/tarmoqchi
+    username: postgres
+    password: -gpB{£3*0=l}B73ib{?8f0
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+    show-sql: true
+server:
+  port: 8079

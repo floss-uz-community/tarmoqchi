@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="Gradle: org.junit.platform:junit-platform-console:1.10.0" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="org.junit.platform" artifactId="junit-platform-console" version="1.10.0" baseVersion="1.10.0" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.junit.platform/junit-platform-console/1.10.0/9901db09e60bf678e4a22fd4be564f10aa7c585/junit-platform-console-1.10.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.junit.platform/junit-platform-console/1.10.0/787bbf73d574270e5b775c8f2cf5a7ee201b3db9/junit-platform-console-1.10.0-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

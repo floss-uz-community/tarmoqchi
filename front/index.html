@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTTP Tunneling Project</title>
+    <style>
+        /* Reset and base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f8f8;
+            color: #333;
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            width: 50%;
+            background-color: #ffffff;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+            margin: 0 auto;
+            padding: 0;
+        }
+
+        /* Header styles */
+        header {
+            padding: 30px 0;
+            text-align: center;
+            border-bottom: 1px solid #eee;
+            width: 100%;
+        }
+
+        .logo {
+            max-width: 300px;
+            margin-bottom: 10px;
+        }
+
+        /* Content sections */
+        .section {
+            padding: 40px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .section:last-child {
+            border-bottom: none;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: #222;
+        }
+
+        h2 {
+            font-size: 1.7rem;
+            margin-bottom: 25px;
+            color: #333;
+        }
+
+        h3 {
+            font-size: 1rem;
+            margin-bottom: 15px;
+            color: #444;
+        }
+
+        p {
+            margin-bottom: 20px;
+            color: #555;
+        }
+
+        /* Features section */
+        .features-list {
+            list-style-type: none;
+        }
+
+        .feature-item {
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .feature-item:last-child {
+            border-bottom: none;
+        }
+
+        /* Installation section */
+        .step {
+            margin-bottom: 30px;
+        }
+
+        .code-block {
+            background-color: #f5f5f5;
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+            margin-bottom: 20px;
+            border: 1px solid #eee;
+        }
+
+        .code-block code {
+            font-family: 'Courier New', Courier, monospace;
+            color: #333;
+        }
+
+        /* Footer */
+        footer {
+            padding: 30px 40px;
+            text-align: center;
+            color: #777;
+            width: 100%;
+        }
+
+        /* Responsive styles */
+        @media (max-width: 1200px) {
+            .container {
+                width: 70%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                width: 90%;
+            }
+
+            .section {
+                padding: 30px 20px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            h2 {
+                font-size: 1.7rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <img src="logo.png" alt="HTTP Tunneling Logo" class="logo">
+    </header>
+
+    <section class="section">
+        <h1>Tarmoqchi - The Lightweight Tunneling Tool 🚀</h1>
+        <p>A powerful, secure and efficient solution for HTTP tunneling. Create secure tunnels to expose your local services to the internet with ease.</p>
+    </section>
+
+    <section class="section">
+        <h2>Features</h2>
+        <ul class="features-list">
+            <li class="feature-item">
+                <h3>🔗 Secure Tunneling – Connect your local services to the internet with ease.</h3>
+            </li>
+            <li class="feature-item">
+                <h3>⚡ Blazing Fast – Experience high-speed, low-latency connections.</h3>
+            </li>
+            <li class="feature-item">
+                <h3>🔐 Authentication – Secure your tunnel with token-based authentication.</h3>
+            </li>
+        </ul>
+    </section>
+
+    <section class="section" id="installation">
+        <h2>Installation</h2>
+
+        <div class="step">
+            <h3>1. Download</h3>
+            <div class="code-block">
+                <code>git clone https://github.com/username/http-tunneling.git</code>
+            </div>
+        </div>
+
+        <div class="step">
+            <h3>2. Authorization</h3>
+            <div class="code-block">
+                <code>cd http-tunneling<br>npm install</code>
+            </div>
+        </div>
+
+        <div class="step">
+            <h3>3. Create tunnel</h3>
+            <div class="code-block">
+                <code>cp config.example.json config.json<br>nano config.json</code>
+            </div>
+            <p>Edit the configuration file to set up your tunnel endpoints and security settings.</p>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2025 HTTP Tunneling Project. All rights reserved.</p>
+    </footer>
+</div>
+</body>
+</html>
