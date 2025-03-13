@@ -8,8 +8,9 @@ import uz.server.domain.entity.User;
 import uz.server.domain.exception.BaseException;
 import uz.server.repository.TunnelRepository;
 
+import java.security.SecureRandom;
+import java.util.Base64;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -27,9 +28,8 @@ public class TunnelService {
         }
 
         Tunnel save = repo.save(Tunnel.builder()
-                .active(true)
                 .sessionId(sessionId)
-                .subdomain(UUID.randomUUID().toString())
+                .subdomain(getUniqueString())
                 .user(user)
                 .build());
 
@@ -37,7 +37,13 @@ public class TunnelService {
 
         return save.getSubdomain();
     }
-    
+
+    private static String getUniqueString() {
+        byte[] randomBytes = new byte[8];
+        new SecureRandom().nextBytes(randomBytes);
+        return Base64.getUrlEncoder().withoutPadding().encodeToString(randomBytes);
+    }
+
     public void deactivate(Long tunnelId) {
         log.info("Deactivating tunnel: tunnelId={}", tunnelId);
         Optional<Tunnel> tunnel = repo.findById(tunnelId);
@@ -47,12 +53,9 @@ public class TunnelService {
             throw new BaseException("Tunnel not found!");
         }
 
-        Tunnel tunnel1 = tunnel.get();
-        tunnel1.setActive(false);
+        log.info("Tunnel deactivated and deleting: tunnelId={}", tunnelId);
 
-        log.info("Tunnel deactivated: tunnelId={}", tunnelId);
-
-        repo.save(tunnel1);
+        repo.deleteById(tunnelId);
     }
 
     public Tunnel getTunnelBySubdomain(String subdomain) {

@@ -15,11 +15,10 @@ public class Tunnel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "session_id")
     private String sessionId;
 
     private String subdomain;
-
-    private boolean active;
 
     @ManyToOne
     private User user;
