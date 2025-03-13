@@ -167,7 +167,7 @@ public class Main implements Runnable {
                 if (Objects.equals(request.getType(), RequestType.FORWARD)) {
                     requestSender(request, webSocket);
                 } else if (Objects.equals(request.getType(), RequestType.CREATED)){
-                    printInfo("Tunnel created: " + request.getTunnelInfo().getMessage() + "v1 -> " + "http://localhost:" + port);
+                    printInfo("Tunnel created: " + request.getTunnelInfo().getMessage() + " -> " + "http://localhost:" + port);
                 } else {
                     printError("Error from server: " + request.getError());
                 }
@@ -202,7 +202,6 @@ public class Main implements Runnable {
     }
 
     void requestSender(Request request, WebSocket webSocket) {
-        printInfo("Forwarding request: " + request.getId());
         try {
             var forwardInfo = request.getForwardInfo();
 
