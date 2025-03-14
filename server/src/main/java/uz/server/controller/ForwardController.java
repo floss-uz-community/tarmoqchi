@@ -21,11 +21,12 @@ import java.util.Map;
 public class ForwardController {
     private final Forwarder forwarder;
 
-    @RequestMapping(value = "/**", headers = {"Upgrade!=websocket", "x-subdomain=*"})
+    @RequestMapping(value = "/**", headers = {"Upgrade!=websocket"})
     public ResponseEntity<String> handleRequest(
             @RequestBody(required = false) String body,
             HttpServletRequest servletRequest) {
-        String subdomain = servletRequest.getHeader("x-subdomain");
+        String host = servletRequest.getHeader("Host");
+        String subdomain = host.split("\\.")[0];
 
         String requestUri = servletRequest.getRequestURI();
 

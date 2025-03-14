@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.BinaryMessage;
+import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import uz.server.domain.entity.Tunnel;
 import uz.server.domain.entity.User;
@@ -35,6 +36,7 @@ public class EventManager {
     private final ObjectMapper objectMapper;
     private final RequestHolder requestHolder;
     private final TunnelService tunnelService;
+    private final ResponseHolder responseHolder;
 
     public void onConnectionEstablished(WebSocketSession session) {
         log.info("WebSocket connection established: sessionId={}", session.getId());
@@ -105,27 +107,31 @@ public class EventManager {
         sessionHolder.removeSession(session.getId());
     }
 
-    public void onResponseReceived(BinaryMessage message) {
-        ByteBuffer payload = message.getPayload();
+    public void onResponseReceived(TextMessage message, String sessionId) {
+        log.info("Response received: sessionId={}", sessionId);
+        String payload = message.getPayload();
 
-        byte[] bytes = new byte[payload.remaining()];
-        payload.get(bytes);
+        responseHolder.add(sessionId, payload);
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        Response response;
+        if (message.isLast()){
+            log.info("Response is last: sessionId={}", sessionId);
+            ObjectMapper objectMapper = new ObjectMapper();
+            Response response;
 
-        try {
-            response = objectMapper.readValue(bytes, Response.class);
-        } catch (IOException e) {
-            log.error("Error while deserializing response: {}", e.getMessage());
-            return;
+            try {
+                response = objectMapper.readValue(responseHolder.get(sessionId), Response.class);
+            } catch (IOException e) {
+                log.error("Error while deserializing response: {}", e.getMessage());
+                return;
+            }
+
+            log.info("Response received: reqId={}, status={}, bodyLength={}",
+                    response.getRequestId(), response.getStatus(),
+                    response.getBody() != null ? response.getBody().length() : 0);
+
+            responseHolder.remove(sessionId);
+            requestHolder.complete(response);
         }
-
-        log.info("Response received: reqId={}, status={}, bodyLength={}",
-                response.getRequestId(), response.getStatus(),
-                response.getBody() != null ? response.getBody().length() : 0);
-
-        requestHolder.complete(response);
     }
 
     public Response sendRequestToCLI(String subdomain, Request request) {

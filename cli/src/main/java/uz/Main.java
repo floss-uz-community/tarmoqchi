@@ -22,6 +22,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.concurrent.*;
 
@@ -223,14 +224,22 @@ public class Main implements Runnable {
                     forwardInfo.getPath()
             ));
 
-            Response send = new Response(request.getId(), statusCode, responseBodyString);
-            ByteBuffer buffer = ByteBuffer.wrap(objectMapper.writeValueAsBytes(send));
+            if (responseBodyString.length() > 10000) {
+                printError("Response body is too large. Truncating to 10000 characters.");
+                return;
+            }
 
-            webSocket.sendBinary(buffer, true);
+            Response send = new Response(request.getId(), statusCode, responseBodyString);
+
+            webSocket.sendText(
+                    objectMapper.writeValueAsString(send), true
+            );
         } catch (ConnectException e) {
             printError("Connection refused. Make sure the local server is running on port " + port);
         } catch (IOException e) {
             printError("I/O error occurred while processing request." + e.getMessage());
+        } catch (Exception e){
+            printError("An error occurred while processing request." + e.getMessage());
         }
     }
 
