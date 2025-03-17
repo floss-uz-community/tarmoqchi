@@ -117,7 +117,9 @@ func printTarmoqchi() {
 
 func authorize(auth string) {
 	reqBody := map[string]string{"token": auth}
+
 	jsonData, err := json.Marshal(reqBody)
+
 	if err != nil {
 		printError("Failed to create request body: " + err.Error())
 		return
@@ -128,6 +130,7 @@ func authorize(auth string) {
 		printError("Failed to connect to server: " + err.Error())
 		return
 	}
+
 	defer resp.Body.Close()
 
 	if resp.StatusCode == 200 {

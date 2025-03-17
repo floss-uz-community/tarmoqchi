@@ -1,60 +1,30 @@
 #!/bin/bash
 
-# Tarmoqchi installation script
+set -e
 
-# Check for root privileges
-if [ "$EUID" -ne 0 ]; then
-  echo "Please run with sudo: sudo bash $0"
+URL_PREFIX="https://github.com/jamshid-elmurodov/tarmoqchi/releases/download/Tarmoqchi-1.0.0"
+INSTALL_DIR=${INSTALL_DIR:-/usr/local/bin}
+
+case "$(uname -sm)" in
+  "Darwin x86_64") FILENAME="tarmoqchi-darwin-amd64" ;;
+  "Darwin arm64") FILENAME="tarmoqchi-darwin-arm64" ;;
+  "Linux x86_64") FILENAME="tarmoqchi-linux-amd64" ;;
+  "Linux i686") FILENAME="tarmoqchi-linux-386" ;;
+  "Linux armv7l") FILENAME="tarmoqchi-linux-arm" ;;
+  "Linux aarch64") FILENAME="tarmoqchi-linux-arm64" ;;
+  "CYGWIN"*|"MINGW"*|"MSYS"*) FILENAME="tarmoqchi-windows-amd64.exe" ; INSTALL_DIR="/c/Windows/System32" ;;
+  *) echo "Noma'lum arxitektura: $(uname -sm) qo‘llab-quvvatlanmaydi." >&2; exit 1 ;;
+esac
+
+echo "$FILENAME fayli GitHub'dan yuklanmoqda..."
+if ! curl -sSLf "$URL_PREFIX/$FILENAME" -o "$INSTALL_DIR/tarmoqchi"; then
+  echo "$INSTALL_DIR ga yozib bo‘lmadi; iltimos, sudo bilan urinib ko‘ring." >&2
   exit 1
 fi
 
-# Detect architecture
-ARCH=$(uname -m)
-
-if [ "$ARCH" = "x86_64" ]; then
-  ARCH_TYPE="x86_64"
-elif [ "$ARCH" = "arm64" ] || [ "$ARCH" = "aarch64" ]; then
-  ARCH_TYPE="arm64"
-else
-  echo "Unsupported architecture: $ARCH"
-  echo "Only x86_64 and arm64 architectures are supported."
+if ! chmod +x "$INSTALL_DIR/tarmoqchi"; then
+  echo "$INSTALL_DIR/tarmoqchi ga bajariladigan huquq berib bo‘lmadi." >&2
   exit 1
 fi
 
-# Detect OS type
-OS=$(uname -s)
-if [ "$OS" = "Darwin" ]; then
-  OS_TYPE="macos"
-elif [ "$OS" = "Linux" ]; then
-  OS_TYPE="linux"
-else
-  echo "Unsupported operating system: $OS"
-  echo "Only macOS and Linux are supported."
-  exit 1
-fi
-
-# Set installation directory
-INSTALL_DIR="/usr/local/bin"
-BINARY_NAME="tarmoqchi"
-
-# GitHub Releases URL
-DOWNLOAD_URL="https://github.com/jamshid-elmurodov/tarmoqchi/releases/download/Tarmoqchi-1.0.0/tarmoqchi-${ARCH_TYPE}"
-
-echo "Installing Tarmoqchi for ${OS_TYPE} on ${ARCH_TYPE}..."
-
-# Download binary
-curl -L "$DOWNLOAD_URL" -o "$INSTALL_DIR/$BINARY_NAME"
-
-# Set executable permissions
-chmod +x "$INSTALL_DIR/$BINARY_NAME"
-
-# Verify installation
-if [ -x "$INSTALL_DIR/$BINARY_NAME" ]; then
-  echo "Tarmoqchi has been successfully installed to $INSTALL_DIR/$BINARY_NAME"
-  echo "You can now run it by typing 'tarmoqchi' in the terminal."
-else
-  echo "Installation failed. Please check error messages above."
-  exit 1
-fi
-
-exit 0
+echo "Tarmoqchi muvaffaqiyatli o‘rnatildi!"
