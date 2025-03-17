@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import org.springframework.web.socket.BinaryMessage;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import uz.server.domain.entity.Tunnel;
@@ -19,7 +18,6 @@ import uz.server.service.TunnelService;
 import uz.server.service.UserService;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -36,7 +34,6 @@ public class EventManager {
     private final ObjectMapper objectMapper;
     private final RequestHolder requestHolder;
     private final TunnelService tunnelService;
-    private final ResponseHolder responseHolder;
 
     public void onConnectionEstablished(WebSocketSession session) {
         log.info("WebSocket connection established: sessionId={}", session.getId());
@@ -111,27 +108,20 @@ public class EventManager {
         log.info("Response received: sessionId={}", sessionId);
         String payload = message.getPayload();
 
-        responseHolder.add(sessionId, payload);
+        Response response;
 
-        if (message.isLast()){
-            log.info("Response is last: sessionId={}", sessionId);
-            ObjectMapper objectMapper = new ObjectMapper();
-            Response response;
-
-            try {
-                response = objectMapper.readValue(responseHolder.get(sessionId), Response.class);
-            } catch (IOException e) {
-                log.error("Error while deserializing response: {}", e.getMessage());
-                return;
-            }
-
-            log.info("Response received: reqId={}, status={}, bodyLength={}",
-                    response.getRequestId(), response.getStatus(),
-                    response.getBody() != null ? response.getBody().length() : 0);
-
-            responseHolder.remove(sessionId);
-            requestHolder.complete(response);
+        try {
+            response = objectMapper.readValue(payload, Response.class);
+        } catch (IOException e) {
+            log.error("Error while deserializing response: {}", e.getMessage());
+            return;
         }
+
+        log.info("Response received: reqId={}, status={}, bodyLength={}",
+                response.getRequestId(), response.getStatus(),
+                response.getBody() != null ? response.getBody().length() : 0);
+
+        requestHolder.complete(response);
     }
 
     public Response sendRequestToCLI(String subdomain, Request request) {

@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HTTP Tunneling Project</title>
+    <title>Tarmoqchi.uz</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
         /* Reset and base styles */
         * {
@@ -17,30 +18,33 @@
             background-color: #f8f8f8;
             color: #333;
             line-height: 1.6;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            min-height: 100vh;
         }
 
         .container {
             width: 50%;
             background-color: #ffffff;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
-            margin: 0 auto;
-            padding: 0;
+            margin: 20px auto;
+            border-radius: 8px;
+            overflow: hidden;
         }
 
         /* Header styles */
         header {
-            padding: 30px 0;
             text-align: center;
             border-bottom: 1px solid #eee;
             width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 30px 45px;
+            background-color: #f9f9f9;
         }
 
         .logo {
-            max-width: 300px;
-            margin-bottom: 10px;
+            max-width: 130px;
+            height: auto;
         }
 
         /* Content sections */
@@ -54,7 +58,7 @@
         }
 
         h1 {
-            font-size: 1.5rem;
+            font-size: 1.8rem;
             margin-bottom: 20px;
             color: #222;
         }
@@ -66,7 +70,7 @@
         }
 
         h3 {
-            font-size: 1rem;
+            font-size: 1.1rem;
             margin-bottom: 15px;
             color: #444;
         }
@@ -74,6 +78,7 @@
         p {
             margin-bottom: 20px;
             color: #555;
+            font-size: 1rem;
         }
 
         /* Features section */
@@ -84,6 +89,12 @@
         .feature-item {
             padding: 15px 0;
             border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+        }
+
+        .feature-item h3 {
+            margin-bottom: 0;
         }
 
         .feature-item:last-child {
@@ -107,6 +118,61 @@
         .code-block code {
             font-family: 'Courier New', Courier, monospace;
             color: #333;
+            word-break: break-all;
+        }
+
+        /* Login Section */
+        .login-box {
+            text-align: center;
+        }
+
+        .login-box a {
+            display: inline-block;
+            background-color: #0073e6;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+
+        .login-box a:hover {
+            background-color: #005bb5;
+        }
+
+        /* User Profile */
+        .profile {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .profile img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            margin-bottom: 10px;
+            object-fit: cover;
+        }
+
+        /* Github link */
+        .github-link {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .github-link a {
+            color: #0073e6;
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .github-link a:hover {
+            text-decoration: underline;
         }
 
         /* Footer */
@@ -115,6 +181,7 @@
             text-align: center;
             color: #777;
             width: 100%;
+            background-color: #f9f9f9;
         }
 
         /* Responsive styles */
@@ -127,6 +194,7 @@
         @media (max-width: 768px) {
             .container {
                 width: 90%;
+                margin: 10px auto;
             }
 
             .section {
@@ -134,11 +202,20 @@
             }
 
             h1 {
-                font-size: 2rem;
+                font-size: 1.6rem;
             }
 
             h2 {
-                font-size: 1.7rem;
+                font-size: 1.5rem;
+            }
+
+            header {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .code-block code {
+                font-size: 0.9rem;
             }
         }
     </style>
@@ -146,7 +223,11 @@
 <body>
 <div class="container">
     <header>
-        <img src="logo.png" alt="HTTP Tunneling Logo" class="logo">
+        <img src="https://pub-efb2bbde7206420692920475ba73046f.r2.dev/logo.png" alt="Tarmoqchi Logo" class="logo">
+
+        <div class="login-box">
+            <a href="/auth/token">Get your auth token</a>
+        </div>
     </header>
 
     <section class="section">
@@ -173,30 +254,45 @@
         <h2>Installation</h2>
 
         <div class="step">
-            <h3>1. Download</h3>
+            <h3>1. Install</h3>
             <div class="code-block">
-                <code>git clone https://github.com/username/http-tunneling.git</code>
+                <code>curl -s https://github.com/jamshid-elmurodov/tarmoqchi/releases/download/Tarmoqchi-1.0.0/install.sh | bash</code>
             </div>
         </div>
 
         <div class="step">
             <h3>2. Authorization</h3>
             <div class="code-block">
-                <code>cd http-tunneling<br>npm install</code>
+                <code>tarmoqchi auth YOUR_AUTH_TOKEN</code>
             </div>
         </div>
 
         <div class="step">
             <h3>3. Create tunnel</h3>
             <div class="code-block">
-                <code>cp config.example.json config.json<br>nano config.json</code>
+                <code>tarmoqchi port YOUR_PORT</code>
             </div>
-            <p>Edit the configuration file to set up your tunnel endpoints and security settings.</p>
+        </div>
+
+        <div class="step">
+            <h3>Options</h3>
+            <div class="code-block">
+                <code>tarmoqchi --version #show version</code>
+            </div>
+            <div class="code-block">
+                <code>tarmoqchi --help #show help</code>
+            </div>
+        </div>
+
+        <div class="github-link">
+            <a href="https://github.com/jamshid-elmurodov/tarmoqchi" target="_blank">
+                <i class="fab fa-github"></i> Contribute to our project on GitHub
+            </a>
         </div>
     </section>
 
     <footer>
-        <p>&copy; 2025 HTTP Tunneling Project. All rights reserved.</p>
+        <p>&copy; 2025 Tarmoqchi. All rights reserved.</p>
     </footer>
 </div>
 </body>

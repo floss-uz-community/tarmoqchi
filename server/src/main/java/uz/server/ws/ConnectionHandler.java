@@ -30,6 +30,7 @@ public class ConnectionHandler extends TextWebSocketHandler {
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) {
         log.info("Message received: {}", message.getPayload());
+
         eventManager.onResponseReceived(message, session.getId());
     }
 }
