@@ -15,7 +15,7 @@ A powerful, secure and efficient solution for HTTP tunneling. Create secure tunn
 ### Quick Install
 
 ```bash
-curl -s https://github.com/jamshid-elmurodov/tarmoqchi/releases/download/Tarmoqchi-1.0.0/install.sh | bash
+curl -fsSL https://github.com/jamshid-elmurodov/tarmoqchi/releases/download/Tarmoqchi-1.0.0/install.sh | sudo bash
 ```
 
 ### Manual Installation
