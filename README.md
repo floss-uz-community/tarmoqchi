@@ -31,7 +31,7 @@ curl -fsSL https://github.com/jamshid-elmurodov/tarmoqchi/releases/download/Tarm
 Before using Tarmoqchi, you need to authenticate using your auth token:
 
 ```bash
-tarmoqchi auth YOUR_AUTH_TOKEN
+tarmoqchi --auth YOUR_AUTH_TOKEN
 ```
 
 You can get your auth token by visiting [Tarmoqchi.uz](https://tarmoqchi.uz/auth/token).
@@ -41,7 +41,7 @@ You can get your auth token by visiting [Tarmoqchi.uz](https://tarmoqchi.uz/auth
 To create a tunnel to your local service:
 
 ```bash
-tarmoqchi port YOUR_PORT
+tarmoqchi --port YOUR_PORT
 ```
 
 Replace `YOUR_PORT` with the local port number your service is running on (e.g., 8080, 3000, etc.).
@@ -51,11 +51,9 @@ Replace `YOUR_PORT` with the local port number your service is running on (e.g.,
 ```bash
 # Show version information
 tarmoqchi --version
-tarmoqchi -V
 
 # Display help information
 tarmoqchi --help
-tarmoqchi -h
 ```
 
 ## ⚙️ Configuration
