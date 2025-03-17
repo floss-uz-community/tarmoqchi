@@ -10,15 +10,6 @@ A powerful, secure and efficient solution for HTTP tunneling. Create secure tunn
 - **⚡ Blazing Fast** – Experience high-speed, low-latency connections
 - **🔐 Authentication** – Secure your tunnel with token-based authentication
 
-## 📋 Table of Contents
-
-- [Installation](#installation)
-- [Usage](#usage)
-- [Configuration](#configuration)
-- [Examples](#examples)
-- [Contributing](#contributing)
-- [License](#license)
-
 ## 🚀 Installation
 
 ### Quick Install
@@ -73,8 +64,6 @@ Tarmoqchi stores configuration files in the following locations:
 
 - Linux/macOS: `~/.config/tarmoqchi/`
 - Windows: `%APPDATA%\tarmoqchi\`
-
-The main configuration file is `config.json`, which contains your auth token and other settings.
 
 ## 📝 Examples
 
