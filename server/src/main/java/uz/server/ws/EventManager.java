@@ -112,6 +112,22 @@ public class EventManager {
 
         try {
             response = objectMapper.readValue(payload, Response.class);
+
+            if(response.getBody() == null) {
+                response.setBody("");
+            }
+
+            if (response.getRequestId() == null) {
+                log.error("Request ID not found in response: sessionId={}", sessionId);
+                sendErrorMessage(sessionId, "Request ID not found in response");
+                return;
+            }
+
+            if (response.getStatus() == 0) {
+                log.error("Status not found in response: sessionId={}", sessionId);
+                sendErrorMessage(sessionId, "Status not found in response");
+                return;
+            }
         } catch (IOException e) {
             log.error("Error while deserializing response: {}", e.getMessage());
             return;
