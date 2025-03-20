@@ -211,9 +211,10 @@ func createTunnel(port string) {
 		defer close(done)
 		for {
 			_, message, err := c.ReadMessage()
+
 			if err != nil {
 				if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
-					printError("Connection closed unexpectedly: " + err.Error())
+					printError("Connection closed")
 				}
 				return
 			}
@@ -263,7 +264,7 @@ func createTunnel(port string) {
 				return
 			}
 		case <-interrupt:
-			printWarning("Connection closed.")
+			printWarning("Tarmoqchi is off, thank you for using")
 
 			// Cleanly close the connection by sending a close message
 			err := c.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
