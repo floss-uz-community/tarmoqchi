@@ -37,12 +37,7 @@ public class ForwardController {
 
         if (subdomain.isEmpty() || Objects.equals(subdomain, "www")) {
             try {
-                if (Objects.equals(requestUri, "/install.sh")) {
-                    servletResponse.sendRedirect("https://github.com/jamshid-elmurodov/tarmoqchi/releases/download/Tarmoqchi-1.0.0/install.sh");
-                } else {
-                    servletResponse.sendRedirect("https://tarmoqchi.uz/front/");
-                }
-
+                servletResponse.sendRedirect("https://tarmoqchi.uz/front/");
                 return ResponseEntity.status(302).body("Redirecting...");
             } catch (IOException e) {
                 throw new BaseException("Error while redirecting to main page");
