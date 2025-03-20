@@ -12,6 +12,6 @@ public class RestExceptionHandler {
     @ExceptionHandler(BaseException.class)
     public ResponseEntity<String> handleBaseException(BaseException e) {
         log.error("BaseException: {}", e.getMessage());
-        return ResponseEntity.ok().body(e.getMessage());
+        return ResponseEntity.badRequest().body(e.getMessage());
     }
 }

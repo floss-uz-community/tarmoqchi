@@ -15,3 +15,8 @@ spring:
     show-sql: true
 server:
   port: 8079
+
+github:
+  client-id: Ov23lii43IRX5jSfONoH
+  client-secret: 76356cffd9cea07825decd9454bc941d319b07a5
+  redirect-uri: https://tarmoqchi.uz/github/callback

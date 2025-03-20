@@ -109,25 +109,9 @@ public class EventManager {
         String payload = message.getPayload();
 
         Response response;
-
         try {
-            response = objectMapper.readValue(payload, Response.class);
-
-            if(response.getBody() == null) {
-                response.setBody("");
-            }
-
-            if (response.getRequestId() == null) {
-                log.error("Request ID not found in response: sessionId={}", sessionId);
-                sendErrorMessage(sessionId, "Request ID not found in response");
-                return;
-            }
-
-            if (response.getStatus() == 0) {
-                log.error("Status not found in response: sessionId={}", sessionId);
-                sendErrorMessage(sessionId, "Status not found in response");
-                return;
-            }
+            response = validateResponse(sessionId, payload);
+            if (response == null) return;
         } catch (IOException e) {
             log.error("Error while deserializing response: {}", e.getMessage());
             return;
@@ -138,6 +122,30 @@ public class EventManager {
                 response.getBody() != null ? response.getBody().length() : 0);
 
         requestHolder.complete(response);
+    }
+
+    private Response validateResponse(String sessionId, String payload) throws JsonProcessingException {
+        Response response = objectMapper.readValue(payload, Response.class);
+
+        if(response.getBody() == null) {
+            log.error("Body not found in response: sessionId={}", sessionId);
+            response.setBody("");
+        }
+
+        if (response.getRequestId() == null) {
+            log.error("Request ID not found in response: sessionId={}", sessionId);
+            sendErrorMessage(sessionId, "Request ID not found in response");
+            return null;
+        }
+
+        if (response.getStatus() == 0) {
+            log.error("Status not found in response: sessionId={}", sessionId);
+            sendErrorMessage(sessionId, "Status not found in response");
+            return null;
+        }
+
+        log.info("Response validated: sessionId={}", sessionId);
+        return response;
     }
 
     public Response sendRequestToCLI(String subdomain, Request request) {
@@ -168,7 +176,7 @@ public class EventManager {
 
         try {
             log.info("Waiting for response: id={}", request.getId());
-            return future.get(5, TimeUnit.SECONDS);
+            return future.get(15, TimeUnit.SECONDS);
         } catch (TimeoutException e) {
             log.error("Timeout: No response from CLI: id={}", request.getId());
             throw new BaseException("Timeout: No response from CLI");
@@ -185,6 +193,7 @@ public class EventManager {
         try {
             log.info("Sending message: sessionId={}, payload={}", sessionId, payload);
             String message = objectMapper.writeValueAsString(payload);
+
             log.info("Request: {}", message);
             sender.send(sessionId, message);
         } catch (JsonProcessingException e) {

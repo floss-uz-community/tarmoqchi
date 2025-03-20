@@ -1,10 +1,16 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Tarmoqchi.uz</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+            integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA=="
+            crossorigin="anonymous"
+            referrerpolicy="no-referrer"
+    />
     <style>
         /* Reset and base styles */
         * {
@@ -14,7 +20,7 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
             background-color: #f8f8f8;
             color: #333;
             line-height: 1.6;
@@ -116,7 +122,7 @@
         }
 
         .code-block code {
-            font-family: 'Courier New', Courier, monospace;
+            font-family: "Courier New", Courier, monospace;
             color: #333;
             word-break: break-all;
         }
@@ -124,6 +130,8 @@
         /* Login Section */
         .login-box {
             text-align: center;
+            display: flex;
+            gap: 10px;
         }
 
         .login-box a {
@@ -142,18 +150,60 @@
             background-color: #005bb5;
         }
 
+        .github-login {
+            background-color: #24292e !important;
+            display: flex !important;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .github-login:hover {
+            background-color: #1a1e22 !important;
+        }
+
         /* User Profile */
         .profile {
-            text-align: center;
-            margin: 20px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         .profile img {
-            width: 100px;
-            height: 100px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
-            margin-bottom: 10px;
             object-fit: cover;
+        }
+
+        .profile .user-info {
+            text-align: left;
+        }
+
+        .profile .user-info p {
+            margin: 0;
+            font-size: 0.9rem;
+        }
+
+        .profile .user-info .username {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .profile .user-info .email {
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .logout-btn {
+            background-color: #f44336 !important;
+            font-size: 0.9rem !important;
+            padding: 8px 16px !important;
+            text-decoration: none;
+            color: white;
+        }
+
+        .logout-btn:hover {
+            background-color: #d32f2f !important;
         }
 
         /* Github link */
@@ -182,6 +232,47 @@
             color: #777;
             width: 100%;
             background-color: #f9f9f9;
+        }
+
+        /* Auth Token Section */
+        .auth-token {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #f5f5f5;
+            border-radius: 6px;
+            border: 1px solid #eee;
+        }
+
+        .auth-token-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .auth-token-value {
+            font-family: "Courier New", Courier, monospace;
+            padding: 10px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            word-break: break-all;
+        }
+
+        .copy-btn {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background-color 0.3s;
+        }
+
+        .copy-btn:hover {
+            background-color: #45a049;
         }
 
         /* Responsive styles */
@@ -217,35 +308,88 @@
             .code-block code {
                 font-size: 0.9rem;
             }
+
+            .login-box {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
 <body>
 <div class="container">
     <header>
-        <img src="https://pub-efb2bbde7206420692920475ba73046f.r2.dev/logo.png" alt="Tarmoqchi Logo" class="logo">
+        <img
+                src="https://pub-efb2bbde7206420692920475ba73046f.r2.dev/logo.png"
+                alt="Tarmoqchi Logo"
+                class="logo"
+        />
 
-        <div class="login-box">
-            <a href="/auth/token">Get your auth token</a>
+        <!-- Conditional rendering based on authentication status -->
+        <div th:if="${user == null}" class="login-box">
+            <a href="/front/github" class="github-login">
+                <i class="fab fa-github"></i> Login with GitHub
+            </a>
+        </div>
+
+        <div th:if="${user != null}" class="profile">
+            <img th:src="${user.avatarUrl}" alt="User Avatar" />
+            <div class="user-info">
+                <p class="username" th:text="${user.name}">Username</p>
+                <p class="email" th:text="${user.email}">user@example.com</p>
+            </div>
+            <a href="/front/logout" class="logout-btn">Logout</a>
         </div>
     </header>
 
     <section class="section">
         <h1>Tarmoqchi - The Lightweight Tunneling Tool 🚀</h1>
-        <p>A powerful, secure and efficient solution for HTTP tunneling. Create secure tunnels to expose your local services to the internet with ease.</p>
+        <p>
+            A powerful, secure and efficient solution for HTTP
+            tunneling. Create secure tunnels to expose your local
+            services to the internet with ease.
+        </p>
+    </section>
+
+    <!-- Display user token if authenticated -->
+    <section th:if="${user != null && user.token != null}" class="section">
+        <h2>Your Authentication Token</h2>
+        <div class="auth-token">
+            <div class="auth-token-header">
+                <h3>Use this token with Tarmoqchi CLI</h3>
+                <button class="copy-btn" onclick="copyToken()">Copy Token</button>
+            </div>
+            <div class="auth-token-value" id="authTokenValue" th:text="${user.token}">
+                YOUR_AUTH_TOKEN_HERE
+            </div>
+            <p>This token is associated with your GitHub account and will be valid until you logout.</p>
+        </div>
     </section>
 
     <section class="section">
         <h2>Features</h2>
         <ul class="features-list">
             <li class="feature-item">
-                <h3>🔗 Secure Tunneling – Connect your local services to the internet with ease.</h3>
+                <h3>
+                    🔗 Secure Tunneling – Connect your local services to
+                    the internet with ease.
+                </h3>
             </li>
             <li class="feature-item">
-                <h3>⚡ Blazing Fast – Experience high-speed, low-latency connections.</h3>
+                <h3>
+                    ⚡ Blazing Fast – Experience high-speed, low-latency
+                    connections.
+                </h3>
             </li>
             <li class="feature-item">
-                <h3>🔐 Authentication – Secure your tunnel with token-based authentication.</h3>
+                <h3>
+                    🔐 Authentication – Secure your tunnel with
+                    token-based authentication.
+                </h3>
+            </li>
+            <li class="feature-item">
+                <h3>
+                    <i class="fab fa-github"></i> GitHub Integration – Login with your GitHub account for seamless authentication.
+                </h3>
             </li>
         </ul>
     </section>
@@ -256,21 +400,25 @@
         <div class="step">
             <h3>1. Install</h3>
             <div class="code-block">
-                <code>curl -s https://github.com/jamshid-elmurodov/tarmoqchi/releases/download/Tarmoqchi-1.0.0/install.sh | bash</code>
+                <code
+                >curl -fsSL
+                    https://tarmoqchi.uz/install.sh
+                    | bash</code
+                >
             </div>
         </div>
 
         <div class="step">
             <h3>2. Authorization</h3>
             <div class="code-block">
-                <code>tarmoqchi auth YOUR_AUTH_TOKEN</code>
+                <code>tarmoqchi --auth YOUR_AUTH_TOKEN</code>
             </div>
         </div>
 
         <div class="step">
             <h3>3. Create tunnel</h3>
             <div class="code-block">
-                <code>tarmoqchi port YOUR_PORT</code>
+                <code>tarmoqchi --port YOUR_PORT</code>
             </div>
         </div>
 
@@ -285,8 +433,12 @@
         </div>
 
         <div class="github-link">
-            <a href="https://github.com/jamshid-elmurodov/tarmoqchi" target="_blank">
-                <i class="fab fa-github"></i> Contribute to our project on GitHub
+            <a
+                    href="https://github.com/jamshid-elmurodov/tarmoqchi"
+                    target="_blank"
+            >
+                <i class="fab fa-github"></i> Contribute to our project
+                on GitHub
             </a>
         </div>
     </section>
@@ -295,5 +447,22 @@
         <p>&copy; 2025 Tarmoqchi. All rights reserved.</p>
     </footer>
 </div>
+
+<script>
+    function copyToken() {
+        const tokenElement = document.getElementById('authTokenValue');
+        const token = tokenElement.textContent.trim();
+
+        navigator.clipboard.writeText(token).then(() => {
+            const copyBtn = document.querySelector('.copy-btn');
+            copyBtn.textContent = 'Copied!';
+            setTimeout(() => {
+                copyBtn.textContent = 'Copy Token';
+            }, 2000);
+        }).catch(err => {
+            console.error('Failed to copy token: ', err);
+        });
+    }
+</script>
 </body>
 </html>

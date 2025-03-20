@@ -42,6 +42,12 @@ type TunnelInfo struct {
 	Message string `json:"message"`
 }
 
+type Response struct {
+	ID         string `json:"requestId"`
+	StatusCode int    `json:"status"`
+	Body       string `json:"body"`
+}
+
 // Request represents a request from the server
 type Request struct {
 	ID          string       `json:"id"`
@@ -302,6 +308,7 @@ func requestSender(request *Request, conn *websocket.Conn, localPort string) {
 
 	// Send the request
 	resp, err := client.Do(req)
+
 	if err != nil {
 		if strings.Contains(err.Error(), "connection refused") {
 			printError(fmt.Sprintf("Connection refused. Make sure the local server is running on port %s", localPort))
@@ -310,6 +317,7 @@ func requestSender(request *Request, conn *websocket.Conn, localPort string) {
 		}
 		return
 	}
+
 	defer resp.Body.Close()
 
 	// Read response body
@@ -330,51 +338,17 @@ func requestSender(request *Request, conn *websocket.Conn, localPort string) {
 	const chunkSize = 10000 // Adjust chunk size as needed
 
 	if len(responseBody) > chunkSize {
-		// Send response in chunks
-		chunks := splitIntoChunks(responseBody, chunkSize)
-		totalChunks := len(chunks)
-
-		for i, chunk := range chunks {
-			// Create chunked response
-			chunkedResponse := Response{
-				ID:         request.ID,
-				StatusCode: resp.StatusCode,
-				Body:       chunk,
-				IsComplete: false,
-			}
-
-			// Set last chunk as complete
-			if i == totalChunks-1 {
-				chunkedResponse.IsComplete = true
-			}
-
-			// Marshal and send chunk
-			responseJSON, err := json.Marshal(chunkedResponse)
-			if err != nil {
-				printError("Error marshaling chunked response: " + err.Error())
-				return
-			}
-
-			err = conn.WriteMessage(websocket.TextMessage, responseJSON)
-
-			if err != nil {
-				printError("Error sending chunked response to server: " + err.Error())
-				return
-			}
-
-			// Short delay between chunks to avoid overwhelming the connection
-			time.Sleep(10 * time.Millisecond)
-		}
+		printError("Response is too large. Truncating response to 10,000 characters.")
 	} else {
 		// Send response as usual for small payloads
 		response := Response{
 			ID:         request.ID,
 			StatusCode: resp.StatusCode,
 			Body:       responseBody,
-			IsComplete: true,
 		}
 
 		responseJSON, err := json.Marshal(response)
+
 		if err != nil {
 			printError("Error marshaling response: " + err.Error())
 			return
@@ -386,32 +360,6 @@ func requestSender(request *Request, conn *websocket.Conn, localPort string) {
 			return
 		}
 	}
-}
-
-// Helper function to split response into chunks
-func splitIntoChunks(text string, chunkSize int) []string {
-	var chunks []string
-	textLength := len(text)
-
-	for i := 0; i < textLength; i += chunkSize {
-		end := i + chunkSize
-
-		if end > textLength {
-			end = textLength
-		}
-
-		chunks = append(chunks, text[i:end])
-	}
-
-	return chunks
-}
-
-// ChunkedResponse Add this new struct definition to your code
-type Response struct {
-	ID         string `json:"requestId"`
-	StatusCode int    `json:"status"`
-	Body       string `json:"body"`
-	IsComplete bool   `json:"isComplete"`
 }
 
 // Print functions

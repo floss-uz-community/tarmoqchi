@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 @Slf4j
 @RestController
@@ -29,20 +30,25 @@ public class ForwardController {
             @RequestBody(required = false) String body,
             HttpServletRequest servletRequest,
             HttpServletResponse servletResponse) {
+
         String host = servletRequest.getHeader("Host");
-
         String subdomain = getSubdomain(host);
+        String requestUri = servletRequest.getRequestURI();
 
-        if (subdomain.isEmpty()){
+        if (subdomain.isEmpty() || Objects.equals(subdomain, "www")) {
             try {
-                servletResponse.sendRedirect("https://tarmoqchi.uz/main");
+                if (Objects.equals(requestUri, "/install.sh")) {
+                    servletResponse.sendRedirect("https://github.com/jamshid-elmurodov/tarmoqchi/releases/download/Tarmoqchi-1.0.0/install.sh");
+                } else {
+                    servletResponse.sendRedirect("https://tarmoqchi.uz/front/");
+                }
+
                 return ResponseEntity.status(302).body("Redirecting...");
             } catch (IOException e) {
                 throw new BaseException("Error while redirecting to main page");
             }
         }
 
-        String requestUri = servletRequest.getRequestURI();
         String queryString = servletRequest.getQueryString();
 
         if (queryString != null) {
