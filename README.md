@@ -33,7 +33,7 @@ Before using Tarmoqchi, you need to authenticate using your auth token:
 tarmoqchi --auth YOUR_AUTH_TOKEN
 ```
 
-You can get your auth token by visiting [Tarmoqchi.uz](https://tarmoqchi.uz/auth/token).
+You can get your auth token by visiting [Tarmoqchi.uz](https://tarmoqchi.uz/).
 
 ### Creating a Tunnel
 
