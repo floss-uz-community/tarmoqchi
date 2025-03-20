@@ -71,7 +71,7 @@ Tarmoqchi stores configuration files in the following locations:
 python -m http.server 8000
 
 # In a new terminal, create a tunnel to expose it
-tarmoqchi port 8000
+tarmoqchi --port 8000
 ```
 
 ### Exposing Multiple Services
@@ -79,8 +79,8 @@ tarmoqchi port 8000
 You can run multiple instances of Tarmoqchi to expose different services:
 
 ```bash
-tarmoqchi port 3000 # For a React app
-tarmoqchi port 8080 # For a backend API
+tarmoqchi --port 3000 # For a React app
+tarmoqchi --port 8080 # For a backend API
 ```
 
 ## 🤝 Contributing
