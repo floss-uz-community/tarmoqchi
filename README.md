@@ -12,17 +12,16 @@ A powerful, secure and efficient solution for HTTP tunneling. Create secure tunn
 
 ## 🚀 Installation
 
-### Quick Install
+### Quick Install on MacOS/Linux
 
 ```bash
 curl -fsSL https://github.com/jamshid-elmurodov/tarmoqchi/releases/download/Tarmoqchi-1.0.0/install.sh | sudo bash
 ```
 
-### Manual Installation
+### Manual Installation on Windows
 
-1. Download the latest release from the [releases page](https://github.com/jamshid-elmurodov/tarmoqchi/releases)
-2. Extract the archive and move the binary to your PATH
-3. Make it executable with `chmod +x tarmoqchi`
+1. Download the latest release from the [releases page](https://github.com/jamshid-elmurodov/tarmoqchi/releases/tag/Tarmoqchi-1.0.0)
+2. Use it
 
 ## 🔧 Usage
 
