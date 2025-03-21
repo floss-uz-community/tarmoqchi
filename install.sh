@@ -12,7 +12,6 @@ case "$(uname -sm)" in
   "Linux i686") FILENAME="tarmoqchi-linux-386" ;;
   "Linux armv7l") FILENAME="tarmoqchi-linux-arm" ;;
   "Linux aarch64") FILENAME="tarmoqchi-linux-arm64" ;;
-  "CYGWIN"*|"MINGW"*|"MSYS"*) FILENAME="tarmoqchi-windows-amd64.exe" ; INSTALL_DIR="/c/Windows/System32" ;;
   *) echo "Unknown architecture: $(uname -sm) is not supported." >&2; exit 1 ;;
 esac
 
