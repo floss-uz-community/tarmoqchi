@@ -12,17 +12,16 @@ A powerful, secure and efficient solution for HTTP tunneling. Create secure tunn
 
 ## 🚀 Installation
 
-### Quick Install
+### Quick Install on MacOS/Linux
 
 ```bash
 curl -fsSL https://github.com/jamshid-elmurodov/tarmoqchi/releases/download/Tarmoqchi-1.0.0/install.sh | sudo bash
 ```
 
-### Manual Installation
+### Manual Installation on Windows
 
-1. Download the latest release from the [releases page](https://github.com/jamshid-elmurodov/tarmoqchi/releases)
-2. Extract the archive and move the binary to your PATH
-3. Make it executable with `chmod +x tarmoqchi`
+1. Download the latest release from the [releases page](https://github.com/jamshid-elmurodov/tarmoqchi/releases/tag/Tarmoqchi-1.0.0)
+2. Use it
 
 ## 🔧 Usage
 
@@ -34,7 +33,7 @@ Before using Tarmoqchi, you need to authenticate using your auth token:
 tarmoqchi --auth YOUR_AUTH_TOKEN
 ```
 
-You can get your auth token by visiting [Tarmoqchi.uz](https://tarmoqchi.uz/auth/token).
+You can get your auth token by visiting [Tarmoqchi.uz](https://tarmoqchi.uz/).
 
 ### Creating a Tunnel
 
@@ -72,7 +71,7 @@ Tarmoqchi stores configuration files in the following locations:
 python -m http.server 8000
 
 # In a new terminal, create a tunnel to expose it
-tarmoqchi port 8000
+tarmoqchi --port 8000
 ```
 
 ### Exposing Multiple Services
@@ -80,8 +79,8 @@ tarmoqchi port 8000
 You can run multiple instances of Tarmoqchi to expose different services:
 
 ```bash
-tarmoqchi port 3000 # For a React app
-tarmoqchi port 8080 # For a backend API
+tarmoqchi --port 3000 # For a React app
+tarmoqchi --port 8080 # For a backend API
 ```
 
 ## 🤝 Contributing

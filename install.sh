@@ -13,18 +13,18 @@ case "$(uname -sm)" in
   "Linux armv7l") FILENAME="tarmoqchi-linux-arm" ;;
   "Linux aarch64") FILENAME="tarmoqchi-linux-arm64" ;;
   "CYGWIN"*|"MINGW"*|"MSYS"*) FILENAME="tarmoqchi-windows-amd64.exe" ; INSTALL_DIR="/c/Windows/System32" ;;
-  *) echo "Noma'lum arxitektura: $(uname -sm) qo‘llab-quvvatlanmaydi." >&2; exit 1 ;;
+  *) echo "Unknown architecture: $(uname -sm) is not supported." >&2; exit 1 ;;
 esac
 
-echo "$FILENAME fayli GitHub'dan yuklanmoqda..."
+echo "Downloading $FILENAME from GitHub..."
 if ! curl -sSLf "$URL_PREFIX/$FILENAME" -o "$INSTALL_DIR/tarmoqchi"; then
-  echo "$INSTALL_DIR ga yozib bo‘lmadi; iltimos, sudo bilan urinib ko‘ring." >&2
+  echo "Failed to write to $INSTALL_DIR; please try running with sudo." >&2
   exit 1
 fi
 
 if ! chmod +x "$INSTALL_DIR/tarmoqchi"; then
-  echo "$INSTALL_DIR/tarmoqchi ga bajariladigan huquq berib bo‘lmadi." >&2
+  echo "Failed to grant execution permissions to $INSTALL_DIR/tarmoqchi." >&2
   exit 1
 fi
 
-echo "Tarmoqchi muvaffaqiyatli o‘rnatildi!"
+echo "Tarmoqchi has been successfully installed!"

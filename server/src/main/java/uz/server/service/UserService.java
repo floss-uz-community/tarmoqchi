@@ -15,7 +15,6 @@ import uz.server.domain.entity.User;
 import uz.server.domain.exception.BaseException;
 import uz.server.repository.UserRepository;
 
-import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -191,9 +190,5 @@ public class UserService {
             log.error("Failed to parse GitHub access token: code={}", code);
             throw new RuntimeException("Failed to parse GitHub access token", e);
         }
-    }
-
-    public List<User> getUsers() {
-        return repo.findAll();
     }
 }
