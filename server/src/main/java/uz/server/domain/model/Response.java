@@ -13,4 +13,5 @@ public class Response {
     private String requestId;
     private int status;
     private String body;
+    private boolean last;
 }
