@@ -370,8 +370,6 @@ func requestSender(request *Request, conn *websocket.Conn, localPort string) {
 				printError("Error: " + err.Error())
 				break
 			}
-
-			printInfo(fmt.Sprintf("Chunk sent: %t", last))
 		}
 	} else {
 		// Send response as usual for small payloads
