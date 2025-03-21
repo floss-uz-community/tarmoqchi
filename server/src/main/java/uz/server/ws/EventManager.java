@@ -20,6 +20,7 @@ import uz.server.service.UserService;
 import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -34,6 +35,7 @@ public class EventManager {
     private final ObjectMapper objectMapper;
     private final RequestHolder requestHolder;
     private final TunnelService tunnelService;
+    private final ResponseHolder responseHolder;
 
     public void onConnectionEstablished(WebSocketSession session) {
         log.info("WebSocket connection established: sessionId={}", session.getId());
@@ -111,7 +113,21 @@ public class EventManager {
         Response response;
         try {
             response = validateResponse(sessionId, payload);
+
             if (response == null) return;
+
+            responseHolder.add(sessionId, response.getBody());
+
+            if (response.isLast()){
+                log.info("Response is last: sessionId={}", sessionId);
+                String fullResponse = responseHolder.get(sessionId);
+                responseHolder.remove(sessionId);
+
+                response.setBody(fullResponse);
+            } else {
+                log.info("Response is not last: sessionId={}", sessionId);
+                return;
+            }
         } catch (IOException e) {
             log.error("Error while deserializing response: {}", e.getMessage());
             return;
@@ -176,7 +192,10 @@ public class EventManager {
 
         try {
             log.info("Waiting for response: id={}", request.getId());
-            return future.get(15, TimeUnit.SECONDS);
+            return future.get(60, TimeUnit.SECONDS);
+        } catch (CancellationException e){
+            log.error("Request cancelled: id={}", request.getId());
+            throw new BaseException("Request cancelled");
         } catch (TimeoutException e) {
             log.error("Timeout: No response from CLI: id={}", request.getId());
             throw new BaseException("Timeout: No response from CLI");
