@@ -11,6 +11,7 @@ import (
 	"os/signal"
 	"path/filepath"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -19,7 +20,7 @@ import (
 const (
 	wsDomain   = "wss://tarmoqchi.uz/server"
 	httpDomain = "https://tarmoqchi.uz"
-	version    = "Tarmoqchi CLI v1.0.0"
+	version    = "Tarmoqchi CLI v1.3.0"
 )
 
 // RequestType enum
@@ -56,6 +57,74 @@ type Request struct {
 	ForwardInfo *ForwardInfo `json:"forwardInfo,omitempty"`
 	TunnelInfo  *TunnelInfo  `json:"tunnelInfo,omitempty"`
 	Error       string       `json:"error,omitempty"`
+}
+
+// WebSocketManager handles safe writing to WebSocket
+type WebSocketManager struct {
+	conn      *websocket.Conn
+	writeChan chan []byte
+	closeChan chan struct{}
+	wg        sync.WaitGroup
+}
+
+// NewWebSocketManager creates a new WebSocket manager
+func NewWebSocketManager(conn *websocket.Conn) *WebSocketManager {
+	wsm := &WebSocketManager{
+		conn:      conn,
+		writeChan: make(chan []byte, 100), // Buffer size can be adjusted
+		closeChan: make(chan struct{}),
+	}
+
+	// Start the writer goroutine
+	wsm.wg.Add(1)
+	go wsm.writerLoop()
+
+	return wsm
+}
+
+// writerLoop handles all writes to the WebSocket
+func (wsm *WebSocketManager) writerLoop() {
+	defer wsm.wg.Done()
+
+	for {
+		select {
+		case message := <-wsm.writeChan:
+			err := wsm.conn.WriteMessage(websocket.TextMessage, message)
+			if err != nil {
+				printError("WebSocket error: " + err.Error())
+				return
+			}
+		case <-wsm.closeChan:
+			return
+		}
+	}
+}
+
+// Write sends a message to be written to the WebSocket
+func (wsm *WebSocketManager) Write(message []byte) {
+	select {
+	case wsm.writeChan <- message:
+		// Message sent to channel
+	case <-wsm.closeChan:
+		// Manager is closed
+	}
+}
+
+// WritePing sends a ping message to the WebSocket
+func (wsm *WebSocketManager) WritePing() error {
+	return wsm.conn.WriteMessage(websocket.PingMessage, []byte("ping"))
+}
+
+// WriteClose sends a close message to the WebSocket
+func (wsm *WebSocketManager) WriteClose(closeCode int, text string) error {
+	return wsm.conn.WriteMessage(websocket.CloseMessage,
+		websocket.FormatCloseMessage(closeCode, text))
+}
+
+// Close shuts down the WebSocket manager
+func (wsm *WebSocketManager) Close() {
+	close(wsm.closeChan)
+	wsm.wg.Wait() // Wait for writer goroutine to finish
 }
 
 func main() {
@@ -192,7 +261,15 @@ func createTunnel(port string) {
 		printError("Error connecting to the server: " + err.Error())
 		return
 	}
-	defer c.Close()
+
+	// Create WebSocketManager for safe concurrent writes
+	wsManager := NewWebSocketManager(c)
+
+	// Ensure resources are cleaned up properly
+	defer func() {
+		wsManager.Close()
+		c.Close()
+	}()
 
 	printWarning("The tunnel will automatically close in 4 hours.")
 
@@ -230,7 +307,7 @@ func createTunnel(port string) {
 			case Forward:
 				{
 					if request.ForwardInfo != nil {
-						go requestSender(&request, c, port)
+						go requestSender(&request, wsManager, port)
 					} else {
 						printError("Invalid forward request: forwardInfo is missing.")
 					}
@@ -248,7 +325,6 @@ func createTunnel(port string) {
 					}
 				}
 			}
-
 		}
 	}()
 
@@ -259,7 +335,7 @@ func createTunnel(port string) {
 			return
 		case <-ticker.C:
 			// Send ping message
-			err := c.WriteMessage(websocket.PingMessage, []byte("ping"))
+			err := wsManager.WritePing()
 			if err != nil {
 				printError("Failed to send ping: " + err.Error())
 				return
@@ -268,12 +344,13 @@ func createTunnel(port string) {
 			printWarning("Tarmoqchi is off, thank you for using")
 
 			// Cleanly close the connection by sending a close message
-			err := c.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
+			err := wsManager.WriteClose(websocket.CloseNormalClosure, "")
 			if err != nil {
 				printError("Error during closing websocket: " + err.Error())
 				return
 			}
 
+			// Wait for the server to close the connection
 			select {
 			case <-done:
 			case <-time.After(time.Second):
@@ -286,7 +363,7 @@ func createTunnel(port string) {
 	}
 }
 
-func requestSender(request *Request, conn *websocket.Conn, localPort string) {
+func requestSender(request *Request, wsManager *WebSocketManager, localPort string) {
 	forwardInfo := request.ForwardInfo
 	targetURL := fmt.Sprintf("http://localhost:%s%s", localPort, forwardInfo.Path)
 
@@ -365,11 +442,8 @@ func requestSender(request *Request, conn *websocket.Conn, localPort string) {
 				return
 			}
 
-			err = conn.WriteMessage(websocket.TextMessage, responseJSON)
-			if err != nil {
-				printError("Error: " + err.Error())
-				break
-			}
+			// Use WebSocketManager for thread-safe writing
+			wsManager.Write(responseJSON)
 		}
 	} else {
 		// Send response as usual for small payloads
@@ -387,11 +461,8 @@ func requestSender(request *Request, conn *websocket.Conn, localPort string) {
 			return
 		}
 
-		err = conn.WriteMessage(websocket.TextMessage, responseJSON)
-		if err != nil {
-			printError("Error sending response to server: " + err.Error())
-			return
-		}
+		// Use WebSocketManager for thread-safe writing
+		wsManager.Write(responseJSON)
 	}
 }
 
