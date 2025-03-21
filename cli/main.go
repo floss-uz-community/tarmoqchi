@@ -46,6 +46,7 @@ type Response struct {
 	ID         string `json:"requestId"`
 	StatusCode int    `json:"status"`
 	Body       string `json:"body"`
+	Last       bool   `json:"last"`
 }
 
 // Request represents a request from the server
@@ -339,13 +340,46 @@ func requestSender(request *Request, conn *websocket.Conn, localPort string) {
 	const chunkSize = 10000 // Adjust chunk size as needed
 
 	if len(responseBody) > chunkSize {
-		printError("Response is too large. Truncating response to 10,000 characters.")
+		for len(responseBody) > 0 {
+			end := chunkSize
+			last := false
+
+			if len(responseBody) <= chunkSize {
+				end = len(responseBody)
+				last = true
+			}
+
+			chunk := responseBody[:end]
+			responseBody = responseBody[end:]
+
+			response := Response{
+				ID:         request.ID,
+				StatusCode: resp.StatusCode,
+				Body:       chunk,
+				Last:       last,
+			}
+
+			responseJSON, err := json.Marshal(response)
+			if err != nil {
+				printError("Error marshaling response: " + err.Error())
+				return
+			}
+
+			err = conn.WriteMessage(websocket.TextMessage, responseJSON)
+			if err != nil {
+				printError("Error: " + err.Error())
+				break
+			}
+
+			printInfo(fmt.Sprintf("Chunk sent: %t", last))
+		}
 	} else {
 		// Send response as usual for small payloads
 		response := Response{
 			ID:         request.ID,
 			StatusCode: resp.StatusCode,
 			Body:       responseBody,
+			Last:       true,
 		}
 
 		responseJSON, err := json.Marshal(response)
