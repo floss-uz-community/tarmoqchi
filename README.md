@@ -1,4 +1,4 @@
-# Tarmoqchi - The Lightweight Tunneling Tool 
+# Tarmoqchi - The Tunneling Tool 
 
 HTTP tunneling. Create tunnels to expose your local services to the internet.
 
