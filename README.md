@@ -2,8 +2,6 @@
 
 HTTP tunneling. Create tunnels to expose your local services to the internet.
 
-![Tarmoqchi Logo](https://pub-efb2bbde7206420692920475ba73046f.r2.dev/logo.png)
-
 ## Installation
 
 ### Quick Install on MacOS/Linux
