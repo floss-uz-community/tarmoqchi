@@ -12,7 +12,7 @@ curl -fsSL https://github.com/jamshid-elmurodov/tarmoqchi/releases/download/Tarm
 
 ### Manual Installation on Windows
 
-1. Download the latest release from the [releases page](https://pub-4e4118614197441ca01a142347434959.r2.dev/Screenshot%202025-04-20%20at%2016.32.19.png)
+1. Download the latest release from the [releases page]()
 
 ## Usage
 
