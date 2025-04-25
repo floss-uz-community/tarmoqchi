@@ -414,7 +414,7 @@ func requestSender(request *Request, wsManager *WebSocketManager, localPort stri
 	fmt.Println(fmt.Sprintf("[%s] %s %d %s", currentTime, forwardInfo.Method, resp.StatusCode, forwardInfo.Path))
 
 	// Implement chunking for large responses
-	const chunkSize = 10000 // Adjust chunk size as needed
+	const chunkSize = 500000 // Adjust chunk size as needed
 
 	if len(responseBody) > chunkSize {
 		for len(responseBody) > 0 {

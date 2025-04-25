@@ -6,6 +6,10 @@ spring:
     username: "${SPRING_DATASOURCE_USERNAME}"
     password: "${SPRING_DATASOURCE_PASSWORD}"
     driver-class-name: "org.postgresql.Driver"
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
   jpa:
     hibernate:
       ddl-auto: update
@@ -15,6 +19,9 @@ spring:
     show-sql: true
 server:
   port: 7140
+  tomcat:
+    max-http-form-post-size: 100MB
+    max-swallow-size: 100MB
 
 github:
   client-id: "${GITHUB_CLIENT_ID}"
