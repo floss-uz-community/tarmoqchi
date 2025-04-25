@@ -2,10 +2,10 @@ spring:
   application:
     name: server
   datasource:
-    url: -
-    username: -
-    password: -
-    driver-class-name: -
+    url: "${SPRING_DATASOURCE_URL}"
+    username: "${SPRING_DATASOURCE_USERNAME}"
+    password: "${SPRING_DATASOURCE_PASSWORD}"
+    driver-class-name: "org.postgresql.Driver"
   jpa:
     hibernate:
       ddl-auto: update
@@ -14,9 +14,9 @@ spring:
         format_sql: true
     show-sql: true
 server:
-  port: 8079
+  port: 7140
 
 github:
-  client-id: -
-  client-secret: -
-  redirect-uri: -
+  client-id: "${GITHUB_CLIENT_ID}"
+  client-secret: "${GITHUB_CLIENT_SECRET}"
+  redirect-uri: "${GITHUB_REDIRECT_URI}"
