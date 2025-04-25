@@ -13,8 +13,8 @@ FROM eclipse-temurin:17-jre-alpine
 
 WORKDIR /app
 
-# Copy specific JAR file with a wildcard pattern to be more explicit
-COPY --from=build /app/build/libs/*.jar app.jar
+# Copy the specific JAR file to avoid wildcard issues
+COPY --from=build /app/build/libs/server-0.0.1-SNAPSHOT.jar app.jar
 
 # Expose the service port
 EXPOSE 7140
