@@ -4,7 +4,7 @@ Create tunnels to expose your local services to the internet.
 
 ![video](https://pub-4e4118614197441ca01a142347434959.r2.dev/Nomsizdizayn-ezgif.com-video-to-gif-converter.gif)
 
-## Installation
+## Installation and update
 
 ### Quick Install on MacOS/Linux
 
