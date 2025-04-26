@@ -9,7 +9,7 @@ Create tunnels to expose your local services to the internet.
 ### Quick Install on MacOS/Linux
 
 ```bash
-curl -fsSL https://github.com/jamshid-elmurodov/tarmoqchi/releases/download/Tarmoqchi-1.0.0/install.sh | sudo bash
+curl -fsSL https://github.com/jamshid-elmurodov/tarmoqchi/releases/download/Tarmoqchi-1.1.0/install.sh | sudo bash
 ```
 
 ### Manual Installation on Windows
