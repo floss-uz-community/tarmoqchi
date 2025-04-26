@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
@@ -196,7 +197,8 @@ public class EventManager {
         sendMessage(sessionId, errorRequest);
     }
 
-    private void decrementUserRequests(User user) {
+    @Async
+    public void decrementUserRequests(User user) {
         user.setRemainingRequests(user.getRemainingRequests() - 1);
         userService.update(user);
         log.info("User request count decremented: userId={}, remainingRequests={}", user.getId(), user.getRemainingRequests());

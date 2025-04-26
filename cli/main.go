@@ -34,8 +34,8 @@ const (
 )
 
 const (
-	Not_running_app_of_client ResponseType = "NOT_RUNNING_APP_OF_CLIENT"
-	Response_chunk            ResponseType = "RESPONSE_CHUNK"
+	NotRunningAppOfClient ResponseType = "NOT_RUNNING_APP_OF_CLIENT"
+	ResponseChunk         ResponseType = "RESPONSE_CHUNK"
 )
 
 // ForwardInfo represents forwarding information
@@ -409,7 +409,7 @@ func requestSender(request *Request, wsManager *WebSocketManager, localPort stri
 			StatusCode:   500,
 			Body:         "",
 			Last:         false,
-			ResponseType: Not_running_app_of_client,
+			ResponseType: NotRunningAppOfClient,
 		}
 
 		responseJSON, err := json.Marshal(response)
@@ -458,7 +458,7 @@ func requestSender(request *Request, wsManager *WebSocketManager, localPort stri
 				StatusCode:   resp.StatusCode,
 				Body:         chunk,
 				Last:         last,
-				ResponseType: Response_chunk,
+				ResponseType: ResponseChunk,
 			}
 
 			responseJSON, err := json.Marshal(response)
@@ -477,7 +477,7 @@ func requestSender(request *Request, wsManager *WebSocketManager, localPort stri
 			StatusCode:   resp.StatusCode,
 			Body:         responseBody,
 			Last:         true,
-			ResponseType: Response_chunk,
+			ResponseType: ResponseChunk,
 		}
 
 		responseJSON, err := json.Marshal(response)

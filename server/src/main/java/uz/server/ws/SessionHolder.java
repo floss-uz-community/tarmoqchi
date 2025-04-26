@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.WebSocketSession;
 
+import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
@@ -23,7 +24,15 @@ public class SessionHolder {
 
     public void removeSession(String id) {
         log.info("Removing session with id: {}", id);
-        sessions.remove(id);
+        WebSocketSession remove = sessions.remove(id);
+
+        if (remove != null){
+            try {
+                remove.close();
+            } catch (IOException e) {
+                log.error("Error while closing session with id: {}", id, e);
+            }
+        }
     }
 
     public boolean hasSession(String id) {
