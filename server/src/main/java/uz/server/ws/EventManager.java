@@ -60,6 +60,8 @@ public class EventManager {
         log.warn("WebSocket disconnected: sessionId={}", session.getId());
 
         Tunnel tunnel = tunnelService.getTunnelBySessionId(session.getId());
+        responseHolder.remove(session.getId());
+        requestHolder.remove(session.getId());
         tunnelService.deactivate(tunnel.getId());
         sessionHolder.removeSession(session.getId());
     }
@@ -71,7 +73,20 @@ public class EventManager {
             Response response = parseAndValidateResponse(sessionId, message.getPayload());
             if (response == null) return;
 
-            handleResponseChunks(sessionId, response);
+            if (response.getResponseType() == ResponseType.RESPONSE_CHUNK) {
+                responseHolder.add(sessionId, response.getBody());
+
+                if (response.isLast()) {
+                    response.setBody(responseHolder.get(sessionId));
+                    responseHolder.remove(sessionId);
+                } else {
+                    log.info("Chunk received but not last: sessionId={}", sessionId);
+                    return;
+                }
+            } else if (response.getResponseType() == ResponseType.NOT_RUNNING_APP_OF_CLIENT) {
+                requestHolder.complete(new Response(response.getRequestId(), 500, Settings.NOT_RUNNING_APP_OF_CLIENT_HTML, false, ResponseType.NOT_RUNNING_APP_OF_CLIENT));
+                return;
+            }
 
             log.info("Response handled: requestId={}, status={}, bodyLength={}",
                     response.getRequestId(), response.getStatus(),
@@ -160,21 +175,6 @@ public class EventManager {
         }
 
         return response;
-    }
-
-    private void handleResponseChunks(String sessionId, Response response) {
-        if (response.getResponseType() == ResponseType.RESPONSE_CHUNK) {
-            responseHolder.add(sessionId, response.getBody());
-
-            if (response.isLast()) {
-                response.setBody(responseHolder.get(sessionId));
-                responseHolder.remove(sessionId);
-            } else {
-                log.info("Chunk received but not last: sessionId={}", sessionId);
-            }
-        } else if (response.getResponseType() == ResponseType.NOT_RUNNING_APP_OF_CLIENT) {
-            requestHolder.complete(new Response(response.getRequestId(), 500, Settings.NOT_RUNNING_APP_OF_CLIENT_HTML, false, ResponseType.NOT_RUNNING_APP_OF_CLIENT));
-        }
     }
 
     private void sendMessage(String sessionId, Request payload) {
