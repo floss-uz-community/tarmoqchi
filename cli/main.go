@@ -20,7 +20,7 @@ import (
 const (
 	wsDomain   = "wss://tarmoqchi.uz/server"
 	httpDomain = "https://tarmoqchi.uz"
-	version    = "Tarmoqchi CLI v1.3.0"
+	version    = "Tarmoqchi CLI v1.1.1"
 )
 
 // RequestType enum
@@ -162,7 +162,8 @@ func main() {
 	} else if *portFlag != "" {
 		createTunnel(*portFlag)
 	} else {
-		printError("Invalid command. Use '--help' to see available commands.")
+		printError("Command not recognized.")
+		printHelp()
 	}
 }
 
