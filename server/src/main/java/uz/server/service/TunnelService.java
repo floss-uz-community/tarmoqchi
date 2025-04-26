@@ -67,7 +67,7 @@ public class TunnelService {
 
     public Tunnel getTunnelBySubdomain(String subdomain) {
         log.info("Getting tunnel by subdomain: subdomain={}", subdomain);
-        return repo.findBySubdomainIgnoreCase(subdomain).orElseThrow(() -> new BaseException("Tunnel not found!"));
+        return repo.findBySubdomainIgnoreCase(subdomain).orElseThrow(() -> new BaseException(Settings.TUNNEL_NOT_FOUND_HTML));
     }
 
     public Tunnel getTunnelBySessionId(String id) {
