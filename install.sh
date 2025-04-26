@@ -2,7 +2,7 @@
 
 set -e
 
-URL_PREFIX="https://github.com/jamshid-elmurodov/tarmoqchi/releases/download/Tarmoqchi-1.0.0"
+URL_PREFIX="https://github.com/jamshid-elmurodov/tarmoqchi/releases/download/Tarmoqchi-1.1.0"
 INSTALL_DIR=${INSTALL_DIR:-/usr/local/bin}
 
 case "$(uname -sm)" in
