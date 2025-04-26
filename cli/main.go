@@ -26,9 +26,16 @@ const (
 // RequestType enum
 type RequestType string
 
+type ResponseType string
+
 const (
 	Forward RequestType = "FORWARD"
 	Created RequestType = "CREATED"
+)
+
+const (
+	Not_running_app_of_client ResponseType = "NOT_RUNNING_APP_OF_CLIENT"
+	Response_chunk            ResponseType = "RESPONSE_CHUNK"
 )
 
 // ForwardInfo represents forwarding information
@@ -44,10 +51,11 @@ type TunnelInfo struct {
 }
 
 type Response struct {
-	ID         string `json:"requestId"`
-	StatusCode int    `json:"status"`
-	Body       string `json:"body"`
-	Last       bool   `json:"last"`
+	ID           string       `json:"requestId"`
+	StatusCode   int          `json:"status"`
+	Body         string       `json:"body"`
+	Last         bool         `json:"last"`
+	ResponseType ResponseType `json:"responseType"`
 }
 
 // Request represents a request from the server
@@ -315,7 +323,7 @@ func createTunnel(port string) {
 			case Created:
 				{
 					if request.TunnelInfo != nil {
-						printInfo("Tunnel created: " + request.TunnelInfo.Message + " -> " + "http://localhost:" + port)
+						printInfo("Tunnel created: " + request.TunnelInfo.Message + " -> " + "http://127.0.0.1:" + port)
 					}
 				}
 			default:
@@ -394,6 +402,23 @@ func requestSender(request *Request, wsManager *WebSocketManager, localPort stri
 		} else {
 			printError("Error sending request: " + err.Error())
 		}
+
+		response := Response{
+			ID:           request.ID,
+			StatusCode:   500,
+			Body:         "",
+			Last:         false,
+			ResponseType: Not_running_app_of_client,
+		}
+
+		responseJSON, err := json.Marshal(response)
+
+		if err != nil {
+			printError("Error marshaling response: " + err.Error())
+			return
+		}
+
+		wsManager.Write(responseJSON)
 		return
 	}
 
@@ -413,8 +438,7 @@ func requestSender(request *Request, wsManager *WebSocketManager, localPort stri
 	currentTime := time.Now().Format("15:04:05")
 	fmt.Println(fmt.Sprintf("[%s] %s %d %s", currentTime, forwardInfo.Method, resp.StatusCode, forwardInfo.Path))
 
-	// Implement chunking for large responses
-	const chunkSize = 500000 // Adjust chunk size as needed
+	const chunkSize = 50000
 
 	if len(responseBody) > chunkSize {
 		for len(responseBody) > 0 {
@@ -430,10 +454,11 @@ func requestSender(request *Request, wsManager *WebSocketManager, localPort stri
 			responseBody = responseBody[end:]
 
 			response := Response{
-				ID:         request.ID,
-				StatusCode: resp.StatusCode,
-				Body:       chunk,
-				Last:       last,
+				ID:           request.ID,
+				StatusCode:   resp.StatusCode,
+				Body:         chunk,
+				Last:         last,
+				ResponseType: Response_chunk,
 			}
 
 			responseJSON, err := json.Marshal(response)
@@ -448,10 +473,11 @@ func requestSender(request *Request, wsManager *WebSocketManager, localPort stri
 	} else {
 		// Send response as usual for small payloads
 		response := Response{
-			ID:         request.ID,
-			StatusCode: resp.StatusCode,
-			Body:       responseBody,
-			Last:       true,
+			ID:           request.ID,
+			StatusCode:   resp.StatusCode,
+			Body:         responseBody,
+			Last:         true,
+			ResponseType: Response_chunk,
 		}
 
 		responseJSON, err := json.Marshal(response)

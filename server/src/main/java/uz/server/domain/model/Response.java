@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import uz.server.domain.enums.ResponseType;
 
 @Getter
 @Setter
@@ -11,7 +12,8 @@ import lombok.Setter;
 @NoArgsConstructor
 public class Response {
     private String requestId;
-    private int status;
+    private Integer status;
     private String body;
     private boolean last;
+    private ResponseType responseType;
 }

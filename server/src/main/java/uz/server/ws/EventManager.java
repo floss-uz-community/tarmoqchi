@@ -7,9 +7,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
+import uz.server.config.Settings;
 import uz.server.domain.entity.Tunnel;
 import uz.server.domain.entity.User;
 import uz.server.domain.enums.RequestType;
+import uz.server.domain.enums.ResponseType;
 import uz.server.domain.exception.BaseException;
 import uz.server.domain.model.Request;
 import uz.server.domain.model.Response;
@@ -25,9 +27,9 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
-@Slf4j
 public class EventManager {
     private final SessionHolder sessionHolder;
     private final UserService userService;
@@ -38,194 +40,165 @@ public class EventManager {
     private final ResponseHolder responseHolder;
 
     public void onConnectionEstablished(WebSocketSession session) {
-        log.info("WebSocket connection established: sessionId={}", session.getId());
+        log.info("WebSocket connected: sessionId={}", session.getId());
 
         sessionHolder.addSession(session.getId(), session);
 
-        String token = extractToken(session);
-        User user;
         try {
-            user = userService.authorizeSessionWithToken(token);
+            User user = authorizeSession(session);
+            String subdomain = createTunnel(session, user);
+            sendConnectionConfirmation(session, subdomain);
+
+            log.info("User authorized and tunnel created: userId={}, subdomain={}", user.getId(), subdomain);
         } catch (BaseException e) {
-            log.error("Error while authorizing user: sessionId={}", session.getId(), e);
+            log.error("Authorization or tunnel creation failed: sessionId={}", session.getId(), e);
             sendErrorMessage(session.getId(), e.getMessage());
-            return;
         }
-
-        log.info("User authorized: userId={}", user.getId());
-
-        String subdomain = createTunnel(session, user);
-        if (subdomain == null) return;
-
-        log.info("Tunnel created: subdomain={}", subdomain);
-        sendConnectionConfirmation(session, subdomain);
-    }
-
-    private String extractToken(WebSocketSession session) {
-        log.info("Extracting token from session: sessionId={}", session.getId());
-        List<String> authorization = session.getHandshakeHeaders().get("Authorization");
-
-        if (authorization == null || authorization.isEmpty()) {
-            log.error("Authorization header not found: sessionId={}", session.getId());
-            throw new BaseException("Authorization required");
-        }
-
-        log.info("Token extracted: sessionId={}", session.getId());
-        return authorization.get(0).replaceFirst("Bearer ", "");
-    }
-
-    private String createTunnel(WebSocketSession session, User user) {
-        try {
-            log.info("Creating tunnel: userId={}", user.getId());
-            return tunnelService.create(session.getId(), user);
-        } catch (BaseException e) {
-            log.error("Error while creating tunnel: userId={}", user.getId(), e);
-            sendErrorMessage(session.getId(), e.getMessage());
-            return null;
-        }
-    }
-
-    private void sendConnectionConfirmation(WebSocketSession session, String subdomain) {
-        log.info("Sending connection confirmation: sessionId={}, subdomain={}", session.getId(), subdomain);
-
-        Request response = Request.builder()
-                .id(UUID.randomUUID().toString())
-                .type(RequestType.CREATED)
-                .tunnelInfo(new TunnelInfo(String.format("https://%s.tarmoqchi.uz/", subdomain)))
-                .build();
-
-        sendMessage(session.getId(), response);
     }
 
     public void onConnectionClosed(WebSocketSession session) {
-        log.warn("WebSocket connection closed: sessionId={}", session.getId());
+        log.warn("WebSocket disconnected: sessionId={}", session.getId());
 
         Tunnel tunnel = tunnelService.getTunnelBySessionId(session.getId());
         tunnelService.deactivate(tunnel.getId());
-
         sessionHolder.removeSession(session.getId());
     }
 
     public void onResponseReceived(TextMessage message, String sessionId) {
         log.info("Response received: sessionId={}", sessionId);
-        String payload = message.getPayload();
 
-        Response response;
         try {
-            response = validateResponse(sessionId, payload);
-
+            Response response = parseAndValidateResponse(sessionId, message.getPayload());
             if (response == null) return;
 
-            responseHolder.add(sessionId, response.getBody());
+            handleResponseChunks(sessionId, response);
 
-            if (response.isLast()){
-                log.info("Response is last: sessionId={}", sessionId);
-                String fullResponse = responseHolder.get(sessionId);
-                responseHolder.remove(sessionId);
+            log.info("Response handled: requestId={}, status={}, bodyLength={}",
+                    response.getRequestId(), response.getStatus(),
+                    response.getBody() != null ? response.getBody().length() : 0);
 
-                response.setBody(fullResponse);
-            } else {
-                log.info("Response is not last: sessionId={}", sessionId);
-                return;
-            }
+            requestHolder.complete(response);
         } catch (IOException e) {
-            log.error("Error while deserializing response: {}", e.getMessage());
-            return;
+            log.error("Failed to parse response: sessionId={}, error={}", sessionId, e.getMessage());
         }
-
-        log.info("Response received: reqId={}, status={}, bodyLength={}",
-                response.getRequestId(), response.getStatus(),
-                response.getBody() != null ? response.getBody().length() : 0);
-
-        requestHolder.complete(response);
-    }
-
-    private Response validateResponse(String sessionId, String payload) throws JsonProcessingException {
-        Response response = objectMapper.readValue(payload, Response.class);
-
-        if(response.getBody() == null) {
-            log.error("Body not found in response: sessionId={}", sessionId);
-            response.setBody("");
-        }
-
-        if (response.getRequestId() == null) {
-            log.error("Request ID not found in response: sessionId={}", sessionId);
-            sendErrorMessage(sessionId, "Request ID not found in response");
-            return null;
-        }
-
-        if (response.getStatus() == 0) {
-            log.error("Status not found in response: sessionId={}", sessionId);
-            sendErrorMessage(sessionId, "Status not found in response");
-            return null;
-        }
-
-        log.info("Response validated: sessionId={}", sessionId);
-        return response;
     }
 
     public Response sendRequestToCLI(String subdomain, Request request) {
-        log.info("Sending request to CLI: subdomain={}, request={}", subdomain, request);
         request.setId(UUID.randomUUID().toString());
+        log.info("Sending request to CLI: subdomain={}, requestId={}", subdomain, request.getId());
 
         CompletableFuture<Response> future = new CompletableFuture<>();
         requestHolder.add(request.getId(), future);
 
-        log.info("Request added to requestHolder: id={}", request.getId());
-
         Tunnel tunnel = tunnelService.getTunnelBySubdomain(subdomain);
         User user = tunnel.getUser();
 
-        log.info("User found: userId={}", user.getId());
-
-        if (user.getRemainingRequests() == 0) {
-            log.error("User has reached the limit of requests: userId={}", user.getId());
+        if (user.getRemainingRequests() <= 0) {
+            log.error("User request limit exceeded: userId={}", user.getId());
             throw new BaseException("You have reached the limit of requests!");
         }
 
-        user.setRemainingRequests(user.getRemainingRequests() - 1);
-        userService.update(user);
-
-        log.info("User updated: userId={}", user.getId());
-
+        decrementUserRequests(user);
         sendMessage(tunnel.getSessionId(), request);
 
         try {
-            log.info("Waiting for response: id={}", request.getId());
             return future.get(60, TimeUnit.SECONDS);
-        } catch (CancellationException e){
-            log.error("Request cancelled: id={}", request.getId());
+        } catch (CancellationException e) {
+            log.error("Request cancelled: requestId={}", request.getId());
             throw new BaseException("Request cancelled");
         } catch (TimeoutException e) {
-            log.error("Timeout: No response from CLI: id={}", request.getId());
+            log.error("Request timeout: requestId={}", request.getId());
             throw new BaseException("Timeout: No response from CLI");
         } catch (Exception e) {
-            log.error("Error in CLI request: id={}", request.getId(), e);
+            log.error("Unexpected error in request: requestId={}", request.getId(), e);
             throw new BaseException("Error in CLI request");
         } finally {
-            log.info("Removing request from requestHolder: id={}", request.getId());
             requestHolder.remove(request.getId());
+            log.info("Request removed from holder: requestId={}", request.getId());
+        }
+    }
+
+    private User authorizeSession(WebSocketSession session) {
+        String token = extractToken(session);
+        return userService.authorizeSessionWithToken(token);
+    }
+
+    private String extractToken(WebSocketSession session) {
+        List<String> authorization = session.getHandshakeHeaders().get("Authorization");
+
+        if (authorization == null || authorization.isEmpty()) {
+            throw new BaseException("Authorization required");
+        }
+
+        return authorization.get(0).replaceFirst("Bearer ", "");
+    }
+
+    private String createTunnel(WebSocketSession session, User user) {
+        return tunnelService.create(session.getId(), user);
+    }
+
+    private void sendConnectionConfirmation(WebSocketSession session, String subdomain) {
+        Request confirmation = Request.builder()
+                .id(UUID.randomUUID().toString())
+                .type(RequestType.CREATED)
+                .tunnelInfo(new TunnelInfo(String.format("https://%s.tarmoqchi.uz/", subdomain)))
+                .build();
+
+        sendMessage(session.getId(), confirmation);
+    }
+
+    private Response parseAndValidateResponse(String sessionId, String payload) throws JsonProcessingException {
+        Response response = objectMapper.readValue(payload, Response.class);
+
+        if (response.getResponseType() == null || response.getRequestId() == null || response.getStatus() == null) {
+            sendErrorMessage(sessionId, "Invalid response: Missing fields");
+            return null;
+        }
+
+        if (response.getBody() == null) {
+            response.setBody("");
+        }
+
+        return response;
+    }
+
+    private void handleResponseChunks(String sessionId, Response response) {
+        if (response.getResponseType() == ResponseType.RESPONSE_CHUNK) {
+            responseHolder.add(sessionId, response.getBody());
+
+            if (response.isLast()) {
+                response.setBody(responseHolder.get(sessionId));
+                responseHolder.remove(sessionId);
+            } else {
+                log.info("Chunk received but not last: sessionId={}", sessionId);
+            }
+        } else if (response.getResponseType() == ResponseType.NOT_RUNNING_APP_OF_CLIENT) {
+            requestHolder.complete(new Response(response.getRequestId(), 500, Settings.NOT_RUNNING_APP_OF_CLIENT_HTML, false, ResponseType.NOT_RUNNING_APP_OF_CLIENT));
         }
     }
 
     private void sendMessage(String sessionId, Request payload) {
         try {
-            log.info("Sending message: sessionId={}, payload={}", sessionId, payload);
             String message = objectMapper.writeValueAsString(payload);
-
-            log.info("Request: {}", message);
             sender.send(sessionId, message);
         } catch (JsonProcessingException e) {
-            log.error("Error while sending message: sessionId={}, payload={}", sessionId, payload, e);
+            log.error("Failed to serialize payload: sessionId={}, payload={}", sessionId, payload, e);
             throw new BaseException("JSON serialization error");
         }
     }
 
     private void sendErrorMessage(String sessionId, String errorMessage) {
-        log.error("Sending error message: sessionId={}, errorMessage={}", sessionId, errorMessage);
-        sendMessage(sessionId, Request.builder()
+        Request errorRequest = Request.builder()
                 .type(RequestType.ERROR)
                 .error(errorMessage)
-                .build());
+                .build();
+
+        sendMessage(sessionId, errorRequest);
+    }
+
+    private void decrementUserRequests(User user) {
+        user.setRemainingRequests(user.getRemainingRequests() - 1);
+        userService.update(user);
+        log.info("User request count decremented: userId={}, remainingRequests={}", user.getId(), user.getRemainingRequests());
     }
 }

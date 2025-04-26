@@ -55,8 +55,6 @@ public class ForwardController {
         Map<String, String> headers = getHeaders(servletRequest);
 
         log.info("Forwarding [{}] request to path: [{}], domain[{}]", method, requestUri, subdomain);
-        log.info("Headers: {}", headers);
-        log.info("Forward body: {}", body);
 
         Response response = forwarder.forward(subdomain, Request.builder()
                 .forwardInfo(ForwardInfo.builder()

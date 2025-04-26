@@ -3,6 +3,7 @@ package uz.server.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import uz.server.config.Settings;
 import uz.server.domain.entity.Tunnel;
 import uz.server.domain.entity.User;
 import uz.server.domain.exception.BaseException;
@@ -71,6 +72,6 @@ public class TunnelService {
 
     public Tunnel getTunnelBySessionId(String id) {
         log.info("Getting tunnel by sessionId: sessionId={}", id);
-        return repo.findBySessionId(id).orElseThrow(() -> new BaseException("Tunnel not found!"));
+        return repo.findBySessionId(id).orElseThrow(() -> new BaseException(Settings.TUNNEL_NOT_FOUND_HTML));
     }
 }
