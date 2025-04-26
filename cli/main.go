@@ -434,11 +434,10 @@ func requestSender(request *Request, wsManager *WebSocketManager, localPort stri
 
 	responseBody := string(bodyBytes)
 
-	// Log the forward
 	currentTime := time.Now().Format("15:04:05")
 	fmt.Println(fmt.Sprintf("[%s] %s %d %s", currentTime, forwardInfo.Method, resp.StatusCode, forwardInfo.Path))
 
-	const chunkSize = 50000
+	const chunkSize = 500000
 
 	if len(responseBody) > chunkSize {
 		for len(responseBody) > 0 {

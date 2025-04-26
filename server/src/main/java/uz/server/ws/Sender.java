@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
+import org.springframework.web.socket.WebSocketSession;
 import uz.server.domain.exception.BaseException;
 
 import java.io.IOException;
@@ -23,8 +24,10 @@ public class Sender {
         }
 
         try {
-            log.info("Sending message to sessionHolder with id: {}", id);
-            sessionHolder.getSession(id).sendMessage(new TextMessage(message));
+            WebSocketSession session = sessionHolder.getSession(id);
+            synchronized (session){
+                session.sendMessage(new TextMessage(message));
+            }
         } catch (IOException e) {
             log.error("Error while sending message to sessionHolder with id: {}", id, e);
             throw new BaseException("Error while sending message to sessionHolder with id: " + id);
