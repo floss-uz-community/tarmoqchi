@@ -8,3 +8,9 @@
 
 # Project exclude paths
 /out/
+
+# Nix
+result
+
+# Direnv
+.direnv

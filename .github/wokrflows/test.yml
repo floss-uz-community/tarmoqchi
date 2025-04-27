@@ -1,0 +1,23 @@
+name: "Test CI"
+
+on: [push, pull_request]
+
+jobs:
+  tests:
+    strategy:
+      matrix:
+        package: [server, cli]
+
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone the repository
+        uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@main
+
+      - name: Check for flake configurations
+        run: nix flake check --all-systems --show-trace
+
+      - name: Build nix package
+        run: nix build .#${{ matrix.package }}
