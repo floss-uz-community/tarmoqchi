@@ -42,10 +42,10 @@ public class TunnelService {
         long timestamp = System.currentTimeMillis() % 100000;
         StringBuilder sb = new StringBuilder();
         SecureRandom RANDOM = new SecureRandom();
-        String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
         sb.append(timestamp);
         for (int i = 0; i < 8; i++) {
+            String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
             sb.append(CHARACTERS.charAt(RANDOM.nextInt(CHARACTERS.length())));
         }
         return sb.toString();

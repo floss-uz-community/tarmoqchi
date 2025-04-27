@@ -15,14 +15,14 @@ import uz.server.domain.entity.User;
 import uz.server.domain.exception.BaseException;
 import uz.server.repository.UserRepository;
 
-import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class UserService {
-    private final UserRepository repo;
+    private final UserRepository userRepository;
     private final ObjectMapper objectMapper;
     private final RestTemplate restTemplate;
 
@@ -35,160 +35,154 @@ public class UserService {
     public User authorizeSessionWithToken(String token) {
         log.info("Authorizing user with token: {}", token);
 
-        User user = getByToken(token);
-
-        if (Objects.isNull(user)){
-            log.error("Token is incorrect, please check your token and try again!");
-            throw new BaseException("Token is incorrect, please check your token and try again!");
-        }
-
-        log.info("User authorized: userId={}", user.getId());
-        return user;
+        return getByToken(token)
+                .orElseThrow(() -> {
+                    log.error("Invalid token: {}", token);
+                    return new BaseException("Token is incorrect, please check your token and try again!");
+                });
     }
 
     public void authorize(String token) {
         User user = authorizeSessionWithToken(token);
 
-        if (user.getConnectedToCLI()) {
-            log.error("User's token already connected to CLI!");
+        if (Boolean.TRUE.equals(user.getConnectedToCLI())) {
+            log.error("User already connected to CLI: userId={}", user.getId());
             throw new BaseException("User already connected to CLI!");
         }
 
         user.setConnectedToCLI(true);
-        repo.save(user);
+        userRepository.save(user);
+        log.info("User connected to CLI successfully: userId={}", user.getId());
     }
 
-    public User getByToken(String token) {
-        log.info("Getting user by token: token={}", token);
-        return repo.findByToken(token);
+    public Optional<User> getByToken(String token) {
+        log.debug("Fetching user by token");
+        return Optional.ofNullable(userRepository.findByToken(token));
     }
 
-    public User findById(Long id) {
-        log.info("Getting user by id: userId={}", id);
-        return repo.findById(id).orElse(null);
+    public Optional<User> findById(Long id) {
+        log.debug("Fetching user by ID: {}", id);
+        return userRepository.findById(id);
     }
 
     public void update(User user) {
         log.info("Updating user: userId={}", user.getId());
-        repo.save(user);
+        userRepository.save(user);
     }
 
     @Transactional
     public User authorizeWithGithub(String code) {
-        log.info("Authorizing user with GitHub: code={}", code);
-        return getGithubUserInfo(getAccessToken(code));
+        String accessToken = fetchAccessTokenFromGithub(code);
+        return fetchGithubUserInfo(accessToken);
     }
 
-    public User getGithubUserInfo(String accessToken) {
-        log.info("Getting GitHub user info: accessToken={}", accessToken);
-        HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(accessToken);
-        HttpEntity<String> entity = new HttpEntity<>("", headers);
-
-        ResponseEntity<String> response = restTemplate.exchange(
-                "https://api.github.com/user",
-                HttpMethod.GET,
-                entity,
-                String.class
-        );
-
-        try {
-            log.info("response.getBody()={}", response.getBody());
-            User user = objectMapper.readValue(response.getBody(), User.class);
-
-            User userById = findById(user.getId());
-
-            if (userById != null){
-                log.info("User already exists: userId={}", user.getId());
-
-                userById.setAvatarUrl(user.getAvatarUrl());
-                userById.setGithubProfile(user.getGithubProfile());
-                userById.setName(user.getName());
-                return userById;
-            }
-
-            log.info("User not found, creating new user: userId={}", user.getId());
-            user.setRemainingRequests(300);
-            user.setConnectedToCLI(false);
-            user.setToken(UUID.randomUUID().toString());
-
-            if (user.getEmail() == null || user.getEmail().isEmpty()) {
-                log.info("User email not found, getting primary email from GitHub: userId={}", user.getId());
-                user.setEmail(getPrimaryEmail(accessToken));
-            }
-
-            log.info(user.getAvatarUrl());
-
-            repo.save(user);
-
-            log.info("User created: userId={}", user.getId());
-            return user;
-        } catch (Exception e) {
-            log.error("Failed to parse GitHub user info: accessToken={}", accessToken);
-            log.error("Error: {}", e.getMessage());
-            throw new RuntimeException("Failed to parse GitHub user info", e);
-        }
-    }
-
-    private String getPrimaryEmail(String accessToken) {
-        log.info("Getting primary email from GitHub: accessToken={}", accessToken);
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(accessToken);
-        HttpEntity<String> entity = new HttpEntity<>("", headers);
-
-        ResponseEntity<String> response = restTemplate.exchange(
-                "https://api.github.com/user/emails",
-                HttpMethod.GET,
-                entity,
-                String.class
-        );
-
-        try {
-            log.info("GitHub user emails received: accessToken={}", accessToken);
-            JsonNode root = objectMapper.readTree(response.getBody());
-            for (JsonNode email : root) {
-                if (email.path("primary").asBoolean()) {
-                    log.info("Primary email found: email={}", email.path("email").asText());
-                    return email.path("email").asText();
-                }
-            }
-
-            log.error("Primary email not found: accessToken={}", accessToken);
-            return null;
-        } catch (Exception e) {
-            log.error("Failed to get GitHub user email: accessToken={}", accessToken);
-            throw new RuntimeException("Failed to get GitHub user email", e);
-        }
-    }
-
-    private String getAccessToken(String code) {
-        log.info("Getting GitHub access token: code={}", code);
+    private String fetchAccessTokenFromGithub(String code) {
+        log.info("Fetching GitHub access token");
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-        headers.set("Accept", "application/json");
+        headers.setAccept(MediaType.parseMediaTypes(MediaType.APPLICATION_JSON_VALUE));
 
-        MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
-        map.add("client_id", githubClientId);
-        map.add("client_secret", githubClientSecret);
-        map.add("code", code);
+        MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
+        body.add("client_id", githubClientId);
+        body.add("client_secret", githubClientSecret);
+        body.add("code", code);
 
-        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, headers);
-
-        ResponseEntity<String> response = restTemplate.postForEntity(
-                "https://github.com/login/oauth/access_token",
-                request,
-                String.class
-        );
+        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(body, headers);
 
         try {
-            log.info("GitHub access token received: code={}", code);
+            ResponseEntity<String> response = restTemplate.postForEntity(
+                    "https://github.com/login/oauth/access_token",
+                    request,
+                    String.class
+            );
+
             JsonNode root = objectMapper.readTree(response.getBody());
             return root.path("access_token").asText();
         } catch (Exception e) {
-            log.error("Failed to parse GitHub access token: code={}", code);
-            throw new RuntimeException("Failed to parse GitHub access token", e);
+            log.error("Failed to fetch access token", e);
+            throw new RuntimeException("Failed to fetch access token from GitHub", e);
         }
+    }
+
+    private User fetchGithubUserInfo(String accessToken) {
+        log.info("Fetching GitHub user info");
+
+        HttpEntity<String> request = new HttpEntity<>(getAuthHeaders(accessToken));
+
+        try {
+            ResponseEntity<String> response = restTemplate.exchange(
+                    "https://api.github.com/user",
+                    HttpMethod.GET,
+                    request,
+                    String.class
+            );
+
+            User githubUser = objectMapper.readValue(response.getBody(), User.class);
+
+            return findById(githubUser.getId())
+                    .map(existingUser -> updateExistingUser(existingUser, githubUser))
+                    .orElseGet(() -> createNewUser(githubUser, accessToken));
+
+        } catch (Exception e) {
+            log.error("Failed to fetch GitHub user info", e);
+            throw new RuntimeException("Failed to fetch GitHub user info", e);
+        }
+    }
+
+    private User updateExistingUser(User existingUser, User githubUser) {
+        log.info("Updating existing user: userId={}", existingUser.getId());
+
+        existingUser.setName(githubUser.getName());
+        existingUser.setAvatarUrl(githubUser.getAvatarUrl());
+        existingUser.setGithubProfile(githubUser.getGithubProfile());
+
+        return userRepository.save(existingUser);
+    }
+
+    private User createNewUser(User githubUser, String accessToken) {
+        log.info("Creating new user: userId={}", githubUser.getId());
+
+        githubUser.setRemainingRequests(300);
+        githubUser.setConnectedToCLI(false);
+        githubUser.setToken(UUID.randomUUID().toString());
+
+        if (githubUser.getEmail() == null || githubUser.getEmail().isEmpty()) {
+            githubUser.setEmail(fetchPrimaryEmailFromGithub(accessToken));
+        }
+
+        return userRepository.save(githubUser);
+    }
+
+    private String fetchPrimaryEmailFromGithub(String accessToken) {
+        log.info("Fetching primary email from GitHub");
+
+        HttpEntity<String> request = new HttpEntity<>(getAuthHeaders(accessToken));
+
+        try {
+            ResponseEntity<String> response = restTemplate.exchange(
+                    "https://api.github.com/user/emails",
+                    HttpMethod.GET,
+                    request,
+                    String.class
+            );
+
+            JsonNode emails = objectMapper.readTree(response.getBody());
+            for (JsonNode emailNode : emails) {
+                if (emailNode.path("primary").asBoolean(false)) {
+                    return emailNode.path("email").asText();
+                }
+            }
+            throw new RuntimeException("Primary email not found");
+        } catch (Exception e) {
+            log.error("Failed to fetch primary email", e);
+            throw new RuntimeException("Failed to fetch primary email", e);
+        }
+    }
+
+    private HttpHeaders getAuthHeaders(String accessToken) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(accessToken);
+        return headers;
     }
 }

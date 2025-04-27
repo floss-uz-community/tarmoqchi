@@ -35,4 +35,4 @@ management:
     web:
       exposure:
         include:
-          - "*"
+          - prometheus

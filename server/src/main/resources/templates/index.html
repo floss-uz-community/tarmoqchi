@@ -1,8 +1,10 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Tarmoqchi.uz - HTTP tunneling uchun qulay va xavfsiz yechim" />
+    <meta name="keywords" content="Tarmoqchi, HTTP tunneling, Secure tunneling, GitHub integration" />
     <title>Tarmoqchi.uz</title>
     <link
             rel="stylesheet"
@@ -12,7 +14,19 @@
             referrerpolicy="no-referrer"
     />
     <style>
-        /* Reset and base styles */
+        :root {
+            --primary-color: black;
+            --hover-color: #525456;
+            --secondary-hover: #6c757d;
+            --border-color: black;
+            --background-light: #f8f9fa;
+            --font-primary: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+            Helvetica, Arial, sans-serif;
+            --border-radius: 10px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.2s ease;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -20,414 +34,590 @@
         }
 
         body {
-            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f8f8f8;
-            color: #333;
+            font-family: var(--font-primary);
             line-height: 1.6;
+            background-color: #f5f5f5;
+        }
+
+        .all {
+            position: relative;
+            left: 20%;
+            width: 60%;
             min-height: 100vh;
+            border: 1px solid var(--border-color);
+            padding: 20px;
+            border-radius: var(--border-radius);
+            background: white;
+            margin: 40px 0;
+            box-shadow: var(--box-shadow);
         }
 
-        .container {
-            width: 50%;
-            background-color: #ffffff;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
-            margin: 20px auto;
-            border-radius: 8px;
-            overflow: hidden;
+        .banner-box {
+            background-image: url(https://pub-4e4118614197441ca01a142347434959.r2.dev/tarmoqchi-banner.png);
+            margin-bottom: 20px;
+            height: 200px;
+            background-size: cover;
+            background-position: top left;
+            border-radius: 20px;
+            box-shadow: var(--box-shadow);
         }
 
-        /* Header styles */
-        header {
-            text-align: center;
-            border-bottom: 1px solid #eee;
-            width: 100%;
+        /* Navbar */
+        nav {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 30px 45px;
-            background-color: #f9f9f9;
+            padding: 15px 0;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 30px;
         }
 
         .logo {
-            max-width: 130px;
-            height: auto;
+            height: 40px;
+            width: auto;
         }
 
-        /* Content sections */
+        .login-button {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .login-button:hover {
+            background: var(--hover-color);
+        }
+
+        /* Profile */
+        .profile {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .profile-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1px solid #ddd;
+        }
+
+        .profile-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .profile-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: black;
+        }
+
+        .profile-email {
+            font-size: 12px;
+            color: #333;
+        }
+
+        .logout-button {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            text-decoration: none;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .logout-button:hover {
+            background: var(--secondary-hover);
+        }
+
+        /* Section */
         .section {
-            padding: 40px;
-            border-bottom: 1px solid #eee;
+            margin-bottom: 40px;
+            padding-bottom: 30px;
+            border-bottom: 1px solid var(--border-color);
         }
 
         .section:last-child {
             border-bottom: none;
+            padding-bottom: 0;
         }
 
-        h1 {
-            font-size: 1.8rem;
+        .section-title {
+            font-size: 24px;
+            font-weight: 600;
             margin-bottom: 20px;
-            color: #222;
+            color: black;
         }
 
-        h2 {
-            font-size: 1.7rem;
-            margin-bottom: 25px;
-            color: #333;
+        .section-content {
+            color: black;
+            margin-bottom: 20px;
+            font-size: 20px;
         }
 
-        h3 {
-            font-size: 1.1rem;
+        /* Token section */
+        .token-container {
+            background: var(--background-light);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .token-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 15px;
-            color: #444;
         }
 
-        p {
-            margin-bottom: 20px;
-            color: #555;
-            font-size: 1rem;
+        .token-title {
+            font-size: 16px;
+            font-weight: 500;
+            color: black;
         }
 
-        /* Features section */
+        .copy-button {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: var(--transition);
+        }
+
+        .copy-button:hover {
+            background: var(--secondary-hover);
+        }
+
+        .token-value {
+            background: white;
+            border: 1px solid var(--border-color);
+            padding: 15px;
+            border-radius: 4px;
+            font-family: monospace;
+            color: black;
+            word-break: break-all;
+            margin-bottom: 15px;
+            user-select: all;
+            white-space: nowrap;
+            overflow-x: auto;
+        }
+
+        .token-description {
+            font-size: 14px;
+            color: black;
+        }
+
+        /* Features */
         .features-list {
-            list-style-type: none;
+            list-style: none;
         }
 
         .feature-item {
-            padding: 15px 0;
-            border-bottom: 1px solid #eee;
             display: flex;
-            align-items: center;
+            align-items: flex-start;
+            gap: 16px;
+            padding: 16px 0;
+            border-bottom: 1px solid var(--border-color);
+            transition: var(--transition);
         }
 
-        .feature-item h3 {
-            margin-bottom: 0;
+        .feature-item:hover {
+            background-color: rgba(0, 0, 0, 0.02);
         }
 
         .feature-item:last-child {
             border-bottom: none;
         }
 
-        /* Installation section */
-        .step {
-            margin-bottom: 30px;
-        }
-
-        .code-block {
-            background-color: #f5f5f5;
-            padding: 15px;
-            border-radius: 6px;
-            overflow-x: auto;
-            margin-bottom: 20px;
-            border: 1px solid #eee;
-        }
-
-        .code-block code {
-            font-family: "Courier New", Courier, monospace;
-            color: #333;
-            word-break: break-all;
-        }
-
-        /* Login Section */
-        .login-box {
+        .feature-icon {
+            color: var(--primary-color);
+            font-size: 20px;
+            padding-top: 2px;
+            min-width: 24px;
             text-align: center;
-            display: flex;
-            gap: 10px;
         }
 
-        .login-box a {
-            display: inline-block;
-            background-color: #0073e6;
-            color: white;
-            padding: 10px 20px;
-            text-decoration: none;
-            border-radius: 5px;
-            font-size: 1rem;
-            font-weight: 600;
-            transition: background-color 0.3s;
+        .feature-content h3 {
+            font-size: 18px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: black;
         }
 
-        .login-box a:hover {
-            background-color: #005bb5;
-        }
-
-        .github-login {
-            background-color: #24292e !important;
-            display: flex !important;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .github-login:hover {
-            background-color: #1a1e22 !important;
-        }
-
-        /* User Profile */
-        .profile {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .profile img {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            object-fit: cover;
-        }
-
-        .profile .user-info {
-            text-align: left;
-        }
-
-        .profile .user-info p {
-            margin: 0;
-            font-size: 0.9rem;
-        }
-
-        .profile .user-info .username {
-            font-weight: 600;
+        .feature-content p {
+            font-size: 14px;
             color: #333;
+            line-height: 1.5;
         }
 
-        .profile .user-info .email {
-            font-size: 0.8rem;
-            color: #666;
+        /* GitHub section */
+        .github-section {
+            text-align: center;
+            padding: 20px 0 30px;
         }
 
-        .logout-btn {
-            background-color: #f44336 !important;
-            font-size: 0.9rem !important;
-            padding: 8px 16px !important;
-            text-decoration: none;
-            color: white;
-        }
-
-        .logout-btn:hover {
-            background-color: #d32f2f !important;
-        }
-
-        /* Github link */
         .github-link {
-            text-align: center;
-            margin-top: 30px;
-            font-size: 1.4rem;
-        }
-
-        .github-link a {
-            color: #0073e6;
-            text-decoration: none;
-            font-weight: 600;
             display: inline-flex;
             align-items: center;
             gap: 8px;
+            background: var(--primary-color);
+            color: white;
+            text-decoration: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            font-size: 16px;
+            transition: var(--transition);
         }
 
-        .github-link a:hover {
-            text-decoration: underline;
+        .github-link:hover {
+            background: #495057;
+            transform: translateY(-2px);
         }
 
         /* Footer */
         footer {
-            padding: 30px 40px;
             text-align: center;
-            color: #777;
-            width: 100%;
-            background-color: #f9f9f9;
+            padding: 20px 0;
+            border-top: 1px solid var(--border-color);
         }
 
-        /* Auth Token Section */
-        .auth-token {
-            margin-top: 20px;
-            padding: 20px;
-            background-color: #f5f5f5;
-            border-radius: 6px;
-            border: 1px solid #eee;
+        .copyright {
+            font-size: 14px;
+            color: #6c757d;
+            margin-bottom: 5px;
         }
 
-        .auth-token-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
+        .copyright a {
+            color: black;
+            text-decoration: none;
+            transition: var(--transition);
         }
 
-        .auth-token-value {
-            font-family: "Courier New", Courier, monospace;
-            padding: 10px;
-            background-color: #fff;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            margin-bottom: 10px;
-            word-break: break-all;
+        .copyright a:hover {
+            color: #6c757d;
+            text-decoration: underline;
         }
 
-        .copy-btn {
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            transition: background-color 0.3s;
-        }
-
-        .copy-btn:hover {
-            background-color: #45a049;
-        }
-
-        /* Responsive styles */
+        /* Responsive */
         @media (max-width: 1200px) {
-            .container {
-                width: 70%;
+            .all {
+                left: 10%;
+                width: 80%;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .all {
+                left: 5%;
+                width: 90%;
             }
         }
 
         @media (max-width: 768px) {
-            .container {
-                width: 90%;
+            .all {
+                left: 0;
+                width: 95%;
+                margin: 20px auto;
+                padding: 15px;
+                border-radius: 8px;
+            }
+
+            .banner-box {
+                height: 150px;
+                border-radius: 15px;
+            }
+
+            nav {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+
+            .profile {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .token-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .token-value {
+                font-size: 12px;
+            }
+
+            .feature-item {
+                padding: 12px 0;
+            }
+
+            .section-content {
+                font-size: 16px;
+            }
+
+            .section-title {
+                font-size: 20px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .all {
+                padding: 10px;
                 margin: 10px auto;
             }
 
+            .banner-box {
+                height: 120px;
+                border-radius: 10px;
+                margin-bottom: 15px;
+            }
+
+            nav {
+                padding: 10px 0;
+                margin-bottom: 20px;
+            }
+
+            .profile {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+
+            .profile-info {
+                flex: 1;
+                min-width: 150px;
+            }
+
             .section {
-                padding: 30px 20px;
+                margin-bottom: 30px;
+                padding-bottom: 20px;
             }
 
-            h1 {
-                font-size: 1.6rem;
+            .github-link {
+                padding: 10px 20px;
+                font-size: 14px;
             }
 
-            h2 {
-                font-size: 1.5rem;
+            .feature-icon {
+                font-size: 18px;
             }
 
-            header {
-                flex-direction: column;
-                gap: 20px;
+            .feature-content h3 {
+                font-size: 16px;
             }
 
-            .code-block code {
-                font-size: 0.9rem;
+            .feature-content p {
+                font-size: 13px;
             }
 
-            .login-box {
-                flex-direction: column;
+            .token-container {
+                padding: 15px;
             }
         }
     </style>
 </head>
 <body>
-<div class="container">
-    <header>
+<div class="all">
+    <div class="banner-box" role="banner"></div>
+
+    <nav>
         <img
                 src="https://pub-efb2bbde7206420692920475ba73046f.r2.dev/logo.png"
                 alt="Tarmoqchi Logo"
                 class="logo"
+                loading="lazy"
         />
 
-        <!-- Conditional rendering based on authentication status -->
-        <div th:if="${user == null}" class="login-box">
-            <a href="/front/github" class="github-login">
-                <i class="fab fa-github"></i> Login with GitHub
+        <div th:if="${user == null}">
+            <a href="/front/github" class="login-button" aria-label="Login with GitHub">
+                <i class="fab fa-github" aria-hidden="true"></i> Login with GitHub
             </a>
         </div>
 
         <div th:if="${user != null}" class="profile">
-            <img th:src="${user.avatarUrl}" alt="User Avatar" />
-            <div class="user-info">
-                <p class="username" th:text="${user.name}">Username</p>
-                <p class="email" th:text="${user.email}">user@example.com</p>
+            <img
+                    th:src="${user.avatarUrl}"
+                    alt="User Avatar"
+                    class="profile-avatar"
+                    loading="lazy"
+            />
+            <div class="profile-info">
+                <span class="profile-name" th:text="${user.name}">Username</span>
+                <span class="profile-email" th:text="${user.email}"
+                >user@example.com</span
+                >
             </div>
-            <a href="/front/logout" class="logout-btn">Logout</a>
+            <a href="/front/logout" class="logout-button" aria-label="Logout">
+                <i class="fas fa-sign-out-alt" aria-hidden="true"></i> Logout
+            </a>
         </div>
-    </header>
+    </nav>
 
+    <!-- About Section -->
     <section class="section">
-        <h1>Tarmoqchi - The Lightweight Tunneling Tool 🚀</h1>
-        <p>
-            A powerful, secure and efficient solution for HTTP
-            tunneling. Create secure tunnels to expose your local
-            services to the internet with ease.
-        </p>
+        <div class="section-content">
+            <p>
+                Tarmoqchi - the powerful, secure and efficient solution for HTTP tunneling. Create
+                secure tunnels to expose your local services to the internet with
+                ease.
+            </p>
+        </div>
     </section>
 
-    <!-- Display user token if authenticated -->
+    <!-- Token Section (only shown when logged in) -->
     <section th:if="${user != null && user.token != null}" class="section">
-        <h2>Your Authentication Token</h2>
-        <div class="auth-token">
-            <div class="auth-token-header">
-                <h3>Use this token with Tarmoqchi CLI</h3>
-                <button class="copy-btn" onclick="copyToken()">Copy Token</button>
+        <h2 class="section-title">Your Authentication Token</h2>
+        <div class="token-container">
+            <div class="token-header">
+                <h3 class="token-title">Use this token with Tarmoqchi CLI</h3>
+                <button class="copy-button" onclick="copyToken()" aria-label="Copy token">
+                    <i class="fas fa-copy" aria-hidden="true"></i> Copy
+                </button>
             </div>
-            <div class="auth-token-value" id="authTokenValue" th:text="${user.token}">
+            <div class="token-value" id="authTokenValue" th:text="${user.token}" tabindex="0">
                 YOUR_AUTH_TOKEN_HERE
             </div>
-            <p>This token is associated with your GitHub account and will be valid until you logout.</p>
+            <p class="token-description">
+                This token is associated with your GitHub account and will be valid
+                until you logout. Keep it secure.
+            </p>
         </div>
     </section>
 
+    <!-- Features Section -->
     <section class="section">
-        <h2>Features</h2>
+        <h2 class="section-title">Features</h2>
         <ul class="features-list">
             <li class="feature-item">
-                <h3>
-                    🔗 Secure Tunneling – Connect your local services to
-                    the internet with ease.
-                </h3>
+                <i class="fa fa-link feature-icon" aria-hidden="true"></i>
+                <div class="feature-content">
+                    <h3>Secure Tunneling</h3>
+                    <p>Connect your local services to the internet with ease.</p>
+                </div>
             </li>
             <li class="feature-item">
-                <h3>
-                    ⚡ Blazing Fast – Experience high-speed, low-latency
-                    connections.
-                </h3>
+                <i class="fa fa-bolt feature-icon" aria-hidden="true"></i>
+                <div class="feature-content">
+                    <h3>Blazing Fast</h3>
+                    <p>Experience high-speed, low-latency connections.</p>
+                </div>
             </li>
             <li class="feature-item">
-                <h3>
-                    🔐 Authentication – Secure your tunnel with
-                    token-based authentication.
-                </h3>
-            </li>
-            <li class="feature-item">
-                <h3>
-                    <i class="fab fa-github"></i> GitHub Integration – Login with your GitHub account for seamless authentication.
-                </h3>
+                <i class="fa fa-lock feature-icon" aria-hidden="true"></i>
+                <div class="feature-content">
+                    <h3>Authentication</h3>
+                    <p>Secure your tunnel with token-based authentication.</p>
+                </div>
             </li>
         </ul>
     </section>
 
-    <section class="section" id="installation">
-        <h2>Installation and usage documentation on <a href="https://github.com/jamshid-elmurodov/tarmoqchi">GitHub</a></h2>
-
-        <div class="github-link">
-            <a
-                    href="https://github.com/jamshid-elmurodov/tarmoqchi"
-                    target="_blank"
-            >
-                <i class="fab fa-github"></i> Contribute to our project
-                on GitHub
-            </a>
-        </div>
+    <!-- GitHub Section -->
+    <section class="github-section">
+        <a
+                href="https://github.com/jamshid-elmurodov/tarmoqchi"
+                target="_blank"
+                rel="noopener"
+                class="github-link"
+                aria-label="View Tarmoqchi on GitHub"
+        >
+            <i class="fab fa-github" aria-hidden="true"></i> View on GitHub
+        </a>
     </section>
 
+    <!-- Footer -->
     <footer>
-        <p>&copy; 2025 Tarmoqchi. All rights reserved.</p>
+        <p class="copyright">&copy; <span id="currentYear">2025</span> Tarmoqchi. All rights reserved.</p>
+        <p class="copyright">Powered by <a href="https://floss.uz" target="_blank" rel="noopener">floss.uz</a></p>
     </footer>
 </div>
 
 <script>
-    function copyToken() {
-        const tokenElement = document.getElementById('authTokenValue');
-        const token = tokenElement.textContent.trim();
+    // Update copyright year automatically
+    document.getElementById('currentYear').textContent = new Date().getFullYear();
 
-        navigator.clipboard.writeText(token).then(() => {
-            const copyBtn = document.querySelector('.copy-btn');
-            copyBtn.textContent = 'Copied!';
-            setTimeout(() => {
-                copyBtn.textContent = 'Copy Token';
-            }, 2000);
-        }).catch(err => {
-            console.error('Failed to copy token: ', err);
-        });
+    function copyToken() {
+        const tokenElement = document.getElementById("authTokenValue");
+        const token = tokenElement.textContent.trim();
+        const copyBtn = document.querySelector(".copy-button");
+        const originalText = copyBtn.innerHTML;
+
+        if (navigator.clipboard) {
+            navigator.clipboard
+                .writeText(token)
+                .then(() => {
+                    copyBtn.innerHTML = '<i class="fas fa-check" aria-hidden="true"></i> Copied';
+                    copyBtn.style.backgroundColor = "#28a745";
+
+                    setTimeout(() => {
+                        copyBtn.innerHTML = originalText;
+                        copyBtn.style.backgroundColor = "";
+                    }, 2000);
+                })
+                .catch((err) => {
+                    console.error("Failed to copy token: ", err);
+                    fallbackCopyTextToClipboard(token);
+                });
+        } else {
+            fallbackCopyTextToClipboard(token);
+        }
+    }
+
+    function fallbackCopyTextToClipboard(text) {
+        const copyBtn = document.querySelector(".copy-button");
+        const originalText = copyBtn.innerHTML;
+
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        textArea.style.position = "fixed";
+        textArea.style.left = "-999999px";
+        textArea.style.top = "-999999px";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+
+        try {
+            const successful = document.execCommand('copy');
+            if (successful) {
+                copyBtn.innerHTML = '<i class="fas fa-check" aria-hidden="true"></i> Copied';
+                copyBtn.style.backgroundColor = "#28a745";
+            } else {
+                copyBtn.innerHTML = '<i class="fas fa-times" aria-hidden="true"></i> Failed';
+                copyBtn.style.backgroundColor = "#dc3545";
+            }
+        } catch (err) {
+            console.error('Fallback: Could not copy text: ', err);
+        }
+
+        document.body.removeChild(textArea);
+
+        setTimeout(() => {
+            copyBtn.innerHTML = originalText;
+            copyBtn.style.backgroundColor = "";
+        }, 2000);
     }
 </script>
 </body>
