@@ -9,6 +9,7 @@ jobs:
         package: [server, cli]
 
     runs-on: ubuntu-latest
+
     steps:
       - name: Clone the repository
         uses: actions/checkout@v4
