@@ -1,8 +1,10 @@
 # Project exclude paths
-/cli/.gradle/
-/cli/build/
-/cli/build/classes/java/main/
-/server/.gradle/
 /server/build/
+/server/target
+# Maven Wrapper fayllari
+/server/.mvn/
+/server/mvnw
+/server/mvnw.cmd
+
 # Project exclude paths
 /out/

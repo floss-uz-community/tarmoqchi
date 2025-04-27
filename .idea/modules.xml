@@ -4,7 +4,6 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/server.main.iml" filepath="$PROJECT_DIR$/.idea/modules/server.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/tarmoqchi.iml" filepath="$PROJECT_DIR$/.idea/tarmoqchi.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/uz.server.main.iml" filepath="$PROJECT_DIR$/.idea/modules/uz.server.main.iml" />
     </modules>
   </component>
 </project>
