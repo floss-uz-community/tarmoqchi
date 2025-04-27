@@ -13,6 +13,7 @@ in
 
     meta = with lib; {
       homepage = "https://tarmoqchi.uz";
+      mainProgram = "cli";
       description = "HTTP & TCP tunnelling";
       license = with lib.licenses; [mit];
       platforms = with platforms; linux ++ darwin;

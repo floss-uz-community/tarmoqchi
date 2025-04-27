@@ -13,7 +13,7 @@
   };
 
   outputs = {
-    # self,
+    self,
     nixpkgs,
     flake-utils,
     ...
@@ -34,6 +34,7 @@
 
         # Output package
         packages = {
+          default = self.packages.${system}.cli;
           cli = pkgs.callPackage ./cli/default.nix {inherit pkgs;};
           server = pkgs.callPackage ./server/default.nix {inherit pkgs;};
         };
