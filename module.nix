@@ -22,12 +22,13 @@ flake: {
 
   # The digesting configuration of server
   toml-config = toml.generate "config.toml" {
-    port = cfg.port;
-    url = cfg.address;
-    database_url = "#databaseUrl#";
-    github_client_id = "#ghcid#";
-    github_client_secret = "#ghcsecret#";
-    github_redirect_url = "https://tarmoqchi.uz/github/callback";
+    app.port = cfg.port;
+    spring.datasource.url = "#databaseUrl#";
+    github = {
+      client-id = "#ghcid#";
+      client-secret = "#ghcsecret#";
+      redirect-uri = "https://${cfg.proxy-reverse.domain}/github/callback";
+    };
   };
 
   # Caddy proxy reversing
@@ -45,6 +46,14 @@ flake: {
   nginx = mkIf (cfg.enable && cfg.proxy-reverse.enable && cfg.proxy == "nginx") {
     services.nginx.virtualHosts = lib.debug.traceIf (builtins.isNull cfg.proxy-reverse.domain) "domain can't be null, please specicy it properly!" {
       "${cfg.proxy-reverse.domain}" = {
+        addSSL = true;
+        enableACME = true;
+        locations."/" = {
+          proxyPass = "http://127.0.0.1:${toString cfg.port}";
+          proxyWebsockets = true;
+        };
+      };
+      "*.${cfg.proxy-reverse.domain}" = {
         addSSL = true;
         enableACME = true;
         locations."/" = {
@@ -124,17 +133,13 @@ flake: {
           # Write configuration file for server
           cp -f ${toml-config} ${cfg.dataDir}/config.toml
 
-          ${lib.optionalString cfg.database.socketAuth ''
-            echo "DATABASE_URL=postgres://${cfg.database.user}@/${cfg.database.name}?host=${cfg.database.socket}" > "${cfg.dataDir}/.env"
-            sed -i "s|#databaseUrl#|postgres://${cfg.database.user}@/${cfg.database.name}?host=${cfg.database.socket}|g" "${cfg.dataDir}/config.toml"
-          ''}
+          echo "DATABASE_URL=postgres://${cfg.database.user}:#password#@${cfg.database.host}/${cfg.database.name}" > "${cfg.dataDir}/.env"
+          replace-secret '#password#' '${cfg.database.passwordFile}' '${cfg.dataDir}/.env'
+          source "${cfg.dataDir}/.env"
+          sed -i "s|#databaseUrl#|$DATABASE_URL|g" "${cfg.dataDir}/config.toml"
 
-          ${lib.optionalString (!cfg.database.socketAuth) ''
-            echo "DATABASE_URL=postgres://${cfg.database.user}:#password#@${cfg.database.host}/${cfg.database.name}" > "${cfg.dataDir}/.env"
-            replace-secret '#password#' '${cfg.database.passwordFile}' '${cfg.dataDir}/.env'
-            source "${cfg.dataDir}/.env"
-            sed -i "s|#databaseUrl#|$DATABASE_URL|g" "${cfg.dataDir}/config.toml"
-          ''}
+          replace-secret '#ghcid#' '${cfg.github.id}' '${cfg.dataDir}/config.toml'
+          replace-secret '#ghcsecret#' '${cfg.github.secret}' '${cfg.dataDir}/config.toml'
         '';
       };
     };
@@ -154,7 +159,7 @@ flake: {
         User = cfg.user;
         Group = cfg.group;
         Restart = "always";
-        ExecStart = "${lib.getBin cfg.package}/bin/server server run ${cfg.dataDir}/config.toml";
+        ExecStart = "${lib.getBin cfg.package}/bin/server --config ${cfg.dataDir}/config.toml";
         ExecReload = "${pkgs.coreutils}/bin/kill -s HUP $MAINPID";
         StateDirectory = cfg.user;
         StateDirectoryMode = "0750";
@@ -214,13 +219,7 @@ flake: {
 
     ## Tests (nixos-rebuilds fails if any test fails)
     assertions =
-      [
-        {
-          assertion = (!cfg.database.socketAuth) -> cfg.database.passwordFile != null;
-          message = "services.tarmoqchi.database.passwordFile must be set when using remote database!";
-        }
-      ]
-      ++ lib.optional
+      lib.optional
       (cfg.proxy-reverse.enable)
       {
         assertion = cfg.proxy-reverse.domain != null && cfg.proxy-reverse.domain != "";
@@ -303,24 +302,6 @@ in {
           type = types.str;
           default = "127.0.0.1";
           description = "Database host address. Leave \"127.0.0.1\" if you want local database";
-        };
-
-        socketAuth = mkOption {
-          type = types.bool;
-          default =
-            if local-database
-            then true
-            else false;
-          description = "Use Unix socket authentication for PostgreSQL instead of password authentication when local database wanted.";
-        };
-
-        socket = mkOption {
-          type = types.nullOr types.path;
-          default =
-            if local-database
-            then "/run/postgresql"
-            else null;
-          description = "Path to the PostgreSQL Unix socket.";
         };
 
         port = mkOption {
