@@ -10,7 +10,7 @@ flake: {
   cfg = config.services.tarmoqchi;
 
   # Flake shipped default binary
-  fpkg = flake.packages.${pkgs.stdenv.hostPlatform.system}.default;
+  fpkg = flake.packages.${pkgs.stdenv.hostPlatform.system}.server;
 
   # Toml management
   toml = pkgs.formats.toml {};
