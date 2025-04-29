@@ -128,13 +128,19 @@ flake: {
           # Write configuration file for server
           cp -f ${toml-config} ${cfg.dataDir}/config.toml
 
-          echo "DATABASE_URL=postgres://${cfg.database.user}:#password#@${cfg.database.host}/${cfg.database.name}" > "${cfg.dataDir}/.env"
-          replace-secret '#password#' '${cfg.database.passwordFile}' '${cfg.dataDir}/.env'
-          source "${cfg.dataDir}/.env"
-          sed -i "s|#databaseUrl#|$DATABASE_URL|g" "${cfg.dataDir}/config.toml"
+          echo "DATABASE_URL=jdbc:postgres://${cfg.database.user}:#password#@${cfg.database.host}/${cfg.database.name}" > "${cfg.dataDir}/.env"
+          echo "GITHUB_ID=#ghcid#" >> "${cfg.dataDir}/.env"
+          echo "GITHUB_SECRET=#ghcsecret#" >> "${cfg.dataDir}/.env"
 
-          replace-secret '#ghcid#' '${cfg.github.id}' '${cfg.dataDir}/config.toml'
-          replace-secret '#ghcsecret#' '${cfg.github.secret}' '${cfg.dataDir}/config.toml'
+          replace-secret '#password#' '${cfg.database.passwordFile}' '${cfg.dataDir}/.env'
+          replace-secret '#ghcid#' '${cfg.github.id}' '${cfg.dataDir}/.env'
+          replace-secret '#ghcsecret#' '${cfg.github.secret}' '${cfg.dataDir}/.env'
+
+          source "${cfg.dataDir}/.env"
+
+          sed -i "s|#databaseUrl#|$DATABASE_URL|g" "${cfg.dataDir}/config.toml"
+          sed -i "s|#ghcid#|$GITHUB_ID|g" "${cfg.dataDir}/config.toml"
+          sed -i "s|#ghcsecret#|$GITHUB_SECRET|g" "${cfg.dataDir}/config.toml"
         '';
       };
     };
