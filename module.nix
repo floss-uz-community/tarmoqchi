@@ -154,7 +154,7 @@ flake: {
         User = cfg.user;
         Group = cfg.group;
         Restart = "always";
-        ExecStart = "${lib.getBin cfg.package}/bin/server --config ${cfg.dataDir}/config.toml";
+        ExecStart = "${lib.getBin cfg.package}/bin/tarmoqchi --config ${cfg.dataDir}/config.toml";
         ExecReload = "${pkgs.coreutils}/bin/kill -s HUP $MAINPID";
         StateDirectory = cfg.user;
         StateDirectoryMode = "0750";
