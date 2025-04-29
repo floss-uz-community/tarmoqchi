@@ -3,8 +3,6 @@ spring:
     name: server
   datasource:
     url: ${spring.datasource.url}
-    username: ${spring.datasource.username}
-    password: ${spring.datasource.password}
     driver-class-name: org.postgresql.Driver
   servlet:
     multipart:
@@ -22,7 +20,6 @@ server:
   tomcat:
     max-http-form-post-size: 100MB
     max-swallow-size: 100MB
-
 github:
   client-id: "${github.client-id}"
   client-secret: "${github.client-secret}"
