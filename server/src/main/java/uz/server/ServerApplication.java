@@ -16,7 +16,7 @@ public class ServerApplication {
                 () -> new RuntimeException("Config path not provided")
         );
 
-        Map<String, Object> props = loadToml(path);
+        Map<String, Object> props = loadToml(path.replace("--config=", ""));
 
         SpringApplication app = new SpringApplication(ServerApplication.class);
         app.setDefaultProperties(props);
