@@ -234,12 +234,6 @@ in {
         Tarmoqchi, HTTP & TCP tunneling.
       '';
 
-      address = mkOption {
-        type = types.str;
-        default = "127.0.0.1";
-        description = "Port to use for passing over proxy";
-      };
-
       port = mkOption {
         type = types.int;
         default = 39393;
