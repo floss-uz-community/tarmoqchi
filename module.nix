@@ -32,7 +32,7 @@ flake: {
   };
 
   # Caddy proxy reversing
-  caddy = mkIf (cfg.enable && cfg.proxy-reverse.enable && cfg.proxy == "caddy") {
+  caddy = mkIf (cfg.enable && cfg.proxy-reverse.enable && cfg.proxy-reverse.proxy == "caddy") {
     services.caddy.virtualHosts = lib.debug.traceIf (builtins.isNull cfg.proxy-reverse.domain) "domain can't be null, please specicy it properly!" {
       "${cfg.proxy-reverse.domain}" = {
         extraConfig = ''
@@ -43,7 +43,7 @@ flake: {
   };
 
   # Nginx proxy reversing
-  nginx = mkIf (cfg.enable && cfg.proxy-reverse.enable && cfg.proxy == "nginx") {
+  nginx = mkIf (cfg.enable && cfg.proxy-reverse.enable && cfg.proxy-reverse.proxy == "nginx") {
     services.nginx.virtualHosts = lib.debug.traceIf (builtins.isNull cfg.proxy-reverse.domain) "domain can't be null, please specicy it properly!" {
       "${cfg.proxy-reverse.domain}" = {
         addSSL = true;
