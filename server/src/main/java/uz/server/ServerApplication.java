@@ -30,7 +30,7 @@ public class ServerApplication {
         map.put("github.client-id", toml.getString("github.client-id"));
         map.put("github.client-secret", toml.getString("github.client-secret"));
         map.put("github.redirect-uri", toml.getString("github.redirect-uri"));
-        map.put("app.port", toml.getString("app.port"));
+        map.put("server.port", toml.getString("app.port"));
         return map;
     }
 }

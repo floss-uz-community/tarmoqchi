@@ -2,7 +2,6 @@ spring:
   application:
     name: server
   datasource:
-    url: ${spring.datasource.url}
     driver-class-name: org.postgresql.Driver
   servlet:
     multipart:
@@ -16,14 +15,9 @@ spring:
         format_sql: true
     show-sql: true
 server:
-  port: ${app.port}
   tomcat:
     max-http-form-post-size: 100MB
     max-swallow-size: 100MB
-github:
-  client-id: "${github.client-id}"
-  client-secret: "${github.client-secret}"
-  redirect-uri: "${github.redirect-uri}"
 management:
   endpoint:
     health:
