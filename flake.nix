@@ -28,6 +28,7 @@
 
         # Development environment
         devShells = {
+          default = self.devShells.${system}.server;
           cli = import ./cli/shell.nix {inherit pkgs;};
           server = import ./server/shell.nix {inherit pkgs;};
         };
@@ -39,9 +40,9 @@
           server = pkgs.callPackage ./server/default.nix {inherit pkgs;};
         };
       }
-    );
-  # // {
-  #   # Overlay module
-  #   nixosModules.tarmoqchi = import ./module.nix self;
-  # };
+    )
+    // {
+      # Overlay module
+      nixosModules.tarmoqchi = import ./module.nix self;
+    };
 }

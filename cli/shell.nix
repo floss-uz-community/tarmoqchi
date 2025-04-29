@@ -1,5 +1,4 @@
-{ pkgs ? import <nixpkgs> { } }:
-
+{pkgs ? import <nixpkgs> {}}:
 pkgs.mkShell {
   # nativeBuildInputs is usually what you want -- tools you need to run
   nativeBuildInputs = with pkgs; [
@@ -18,5 +17,5 @@ pkgs.mkShell {
     delve
   ];
 
-  hardeningDisable = [ "all" ];
+  hardeningDisable = ["all"];
 }
