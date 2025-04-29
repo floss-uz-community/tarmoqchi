@@ -22,7 +22,7 @@ in
       install -Dm644 ./target/server-${version}.jar $out/share/tarmoqchi
 
       makeWrapper ${pkgs.jre}/bin/java $out/bin/tarmoqchi \
-        --add-flags "-jar $out/share/tarmoqchi/tarmoqchi.jar"
+        --add-flags "-jar $out/share/tarmoqchi/server-${version}.jar"
 
       runHook postInstall
     '';
