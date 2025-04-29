@@ -10,7 +10,7 @@ flake: {
   cfg = config.services.tarmoqchi;
 
   # Flake shipped default binary
-  fpkg = flake.packages.${pkgs.stdenv.hostPlatform.system}.default;
+  fpkg = flake.packages.${pkgs.stdenv.hostPlatform.system}.server;
 
   # Toml management
   toml = pkgs.formats.toml {};
@@ -22,16 +22,17 @@ flake: {
 
   # The digesting configuration of server
   toml-config = toml.generate "config.toml" {
-    port = cfg.port;
-    url = cfg.address;
-    database_url = "#databaseUrl#";
-    github_client_id = "#ghcid#";
-    github_client_secret = "#ghcsecret#";
-    github_redirect_url = "https://tarmoqchi.uz/github/callback";
+    app.port = toString cfg.port;
+    spring.datasource.url = "#databaseUrl#";
+    github = {
+      client-id = "#ghcid#";
+      client-secret = "#ghcsecret#";
+      redirect-uri = "https://${cfg.proxy-reverse.domain}/github/callback";
+    };
   };
 
   # Caddy proxy reversing
-  caddy = mkIf (cfg.enable && cfg.proxy-reverse.enable && cfg.proxy == "caddy") {
+  caddy = mkIf (cfg.enable && cfg.proxy-reverse.enable && cfg.proxy-reverse.proxy == "caddy") {
     services.caddy.virtualHosts = lib.debug.traceIf (builtins.isNull cfg.proxy-reverse.domain) "domain can't be null, please specicy it properly!" {
       "${cfg.proxy-reverse.domain}" = {
         extraConfig = ''
@@ -42,11 +43,14 @@ flake: {
   };
 
   # Nginx proxy reversing
-  nginx = mkIf (cfg.enable && cfg.proxy-reverse.enable && cfg.proxy == "nginx") {
+  nginx = mkIf (cfg.enable && cfg.proxy-reverse.enable && cfg.proxy-reverse.proxy == "nginx") {
     services.nginx.virtualHosts = lib.debug.traceIf (builtins.isNull cfg.proxy-reverse.domain) "domain can't be null, please specicy it properly!" {
       "${cfg.proxy-reverse.domain}" = {
         addSSL = true;
         enableACME = true;
+        serverAliases = [
+          "*.${cfg.proxy-reverse.domain}"
+        ];
         locations."/" = {
           proxyPass = "http://127.0.0.1:${toString cfg.port}";
           proxyWebsockets = true;
@@ -124,17 +128,19 @@ flake: {
           # Write configuration file for server
           cp -f ${toml-config} ${cfg.dataDir}/config.toml
 
-          ${lib.optionalString cfg.database.socketAuth ''
-            echo "DATABASE_URL=postgres://${cfg.database.user}@/${cfg.database.name}?host=${cfg.database.socket}" > "${cfg.dataDir}/.env"
-            sed -i "s|#databaseUrl#|postgres://${cfg.database.user}@/${cfg.database.name}?host=${cfg.database.socket}|g" "${cfg.dataDir}/config.toml"
-          ''}
+          echo "DATABASE_URL=jdbc:postgres://${cfg.database.user}:#password#@${cfg.database.host}/${cfg.database.name}" > "${cfg.dataDir}/.env"
+          echo "GITHUB_ID=#ghcid#" >> "${cfg.dataDir}/.env"
+          echo "GITHUB_SECRET=#ghcsecret#" >> "${cfg.dataDir}/.env"
 
-          ${lib.optionalString (!cfg.database.socketAuth) ''
-            echo "DATABASE_URL=postgres://${cfg.database.user}:#password#@${cfg.database.host}/${cfg.database.name}" > "${cfg.dataDir}/.env"
-            replace-secret '#password#' '${cfg.database.passwordFile}' '${cfg.dataDir}/.env'
-            source "${cfg.dataDir}/.env"
-            sed -i "s|#databaseUrl#|$DATABASE_URL|g" "${cfg.dataDir}/config.toml"
-          ''}
+          replace-secret '#password#' '${cfg.database.passwordFile}' '${cfg.dataDir}/.env'
+          replace-secret '#ghcid#' '${cfg.github.id}' '${cfg.dataDir}/.env'
+          replace-secret '#ghcsecret#' '${cfg.github.secret}' '${cfg.dataDir}/.env'
+
+          source "${cfg.dataDir}/.env"
+
+          sed -i "s|#databaseUrl#|$DATABASE_URL|g" "${cfg.dataDir}/config.toml"
+          sed -i "s|#ghcid#|$GITHUB_ID|g" "${cfg.dataDir}/config.toml"
+          sed -i "s|#ghcsecret#|$GITHUB_SECRET|g" "${cfg.dataDir}/config.toml"
         '';
       };
     };
@@ -144,7 +150,7 @@ flake: {
       description = "tarmoqchi HTTP & TCP tunneling";
       documentation = ["https://tarmoqchi.uz"];
 
-      after = ["network.target" "tarmoqchi-config.service" "tarmoqchi-migration.service"] ++ lib.optional local-database "postgresql.service";
+      after = ["network.target" "tarmoqchi-config.service"] ++ lib.optional local-database "postgresql.service";
       requires = lib.optional local-database "postgresql.service";
       wants = ["network-online.target"];
       wantedBy = ["multi-user.target"];
@@ -154,7 +160,7 @@ flake: {
         User = cfg.user;
         Group = cfg.group;
         Restart = "always";
-        ExecStart = "${lib.getBin cfg.package}/bin/server server run ${cfg.dataDir}/config.toml";
+        ExecStart = "${lib.getBin cfg.package}/bin/tarmoqchi --config=${cfg.dataDir}/config.toml";
         ExecReload = "${pkgs.coreutils}/bin/kill -s HUP $MAINPID";
         StateDirectory = cfg.user;
         StateDirectoryMode = "0750";
@@ -214,13 +220,7 @@ flake: {
 
     ## Tests (nixos-rebuilds fails if any test fails)
     assertions =
-      [
-        {
-          assertion = (!cfg.database.socketAuth) -> cfg.database.passwordFile != null;
-          message = "services.tarmoqchi.database.passwordFile must be set when using remote database!";
-        }
-      ]
-      ++ lib.optional
+      lib.optional
       (cfg.proxy-reverse.enable)
       {
         assertion = cfg.proxy-reverse.domain != null && cfg.proxy-reverse.domain != "";
@@ -234,12 +234,6 @@ in {
       enable = mkEnableOption ''
         Tarmoqchi, HTTP & TCP tunneling.
       '';
-
-      address = mkOption {
-        type = types.str;
-        default = "127.0.0.1";
-        description = "Port to use for passing over proxy";
-      };
 
       port = mkOption {
         type = types.int;
@@ -303,24 +297,6 @@ in {
           type = types.str;
           default = "127.0.0.1";
           description = "Database host address. Leave \"127.0.0.1\" if you want local database";
-        };
-
-        socketAuth = mkOption {
-          type = types.bool;
-          default =
-            if local-database
-            then true
-            else false;
-          description = "Use Unix socket authentication for PostgreSQL instead of password authentication when local database wanted.";
-        };
-
-        socket = mkOption {
-          type = types.nullOr types.path;
-          default =
-            if local-database
-            then "/run/postgresql"
-            else null;
-          description = "Path to the PostgreSQL Unix socket.";
         };
 
         port = mkOption {

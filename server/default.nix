@@ -9,7 +9,7 @@ in
     inherit version;
 
     src = ./.;
-    mvnHash = "sha256-QUNGJSpunL4XVGZOmCVjQUPlF3FJwfvwMWTBuq08nso=";
+    mvnHash = "sha256-+hGWYg46ai+IuSxM8MwT4j+BEqOjd6HM3gbgtlkx0Bw=";
 
     nativeBuildInputs = with pkgs; [
       makeWrapper
@@ -22,7 +22,7 @@ in
       install -Dm644 ./target/server-${version}.jar $out/share/tarmoqchi
 
       makeWrapper ${pkgs.jre}/bin/java $out/bin/tarmoqchi \
-        --add-flags "-jar $out/share/tarmoqchi/tarmoqchi.jar"
+        --add-flags "-jar $out/share/tarmoqchi/server-${version}.jar"
 
       runHook postInstall
     '';
