@@ -2,10 +2,10 @@ spring:
   application:
     name: server
   datasource:
-    url: "${SPRING_DATASOURCE_URL}"
-    username: "${SPRING_DATASOURCE_USERNAME}"
-    password: "${SPRING_DATASOURCE_PASSWORD}"
-    driver-class-name: "org.postgresql.Driver"
+    url: ${spring.datasource.url}
+    username: ${spring.datasource.username}
+    password: ${spring.datasource.password}
+    driver-class-name: org.postgresql.Driver
   servlet:
     multipart:
       max-file-size: 100MB
@@ -24,9 +24,9 @@ server:
     max-swallow-size: 100MB
 
 github:
-  client-id: "${GITHUB_CLIENT_ID}"
-  client-secret: "${GITHUB_CLIENT_SECRET}"
-  redirect-uri: "${GITHUB_REDIRECT_URI}"
+  client-id: "${github.client-id}"
+  client-secret: "${github.client-secret}"
+  redirect-uri: "${github.redirect-uri}"
 management:
   endpoint:
     health:
