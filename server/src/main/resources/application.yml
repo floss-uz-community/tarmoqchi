@@ -18,7 +18,7 @@ spring:
         format_sql: true
     show-sql: true
 server:
-  port: 7140
+  port: ${app.port}
   tomcat:
     max-http-form-post-size: 100MB
     max-swallow-size: 100MB
