@@ -128,7 +128,7 @@ flake: {
           # Write configuration file for server
           cp -f ${toml-config} ${cfg.dataDir}/config.toml
 
-          echo "DATABASE_URL=\"jdbc:postgres://${cfg.database.host}:${toString cfg.database.port}/${cfg.database.name}?user=${cfg.database.user}\&password=#password#\"" > "${cfg.dataDir}/.env"
+          echo "DATABASE_URL=\"jdbc:postgresql://${cfg.database.host}:${toString cfg.database.port}/${cfg.database.name}?user=${cfg.database.user}\&password=#password#\"" > "${cfg.dataDir}/.env"
           echo "GITHUB_ID=#ghcid#" >> "${cfg.dataDir}/.env"
           echo "GITHUB_SECRET=#ghcsecret#" >> "${cfg.dataDir}/.env"
 
