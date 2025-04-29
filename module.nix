@@ -144,7 +144,7 @@ flake: {
       description = "tarmoqchi HTTP & TCP tunneling";
       documentation = ["https://tarmoqchi.uz"];
 
-      after = ["network.target" "tarmoqchi-config.service" "tarmoqchi-migration.service"] ++ lib.optional local-database "postgresql.service";
+      after = ["network.target" "tarmoqchi-config.service"] ++ lib.optional local-database "postgresql.service";
       requires = lib.optional local-database "postgresql.service";
       wants = ["network-online.target"];
       wantedBy = ["multi-user.target"];
