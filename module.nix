@@ -48,9 +48,14 @@ flake: {
       "${cfg.proxy-reverse.domain}" = {
         addSSL = true;
         enableACME = true;
-        serverAliases = [
-          "*.${cfg.proxy-reverse.domain}"
-        ];
+        locations."/" = {
+          proxyPass = "http://127.0.0.1:${toString cfg.port}";
+          proxyWebsockets = true;
+        };
+      };
+      "*.${cfg.proxy-reverse.domain}" = {
+        addSSL = true;
+        useACMEHost = "${cfg.proxy-reverse.domain}";
         locations."/" = {
           proxyPass = "http://127.0.0.1:${toString cfg.port}";
           proxyWebsockets = true;
