@@ -22,7 +22,7 @@ flake: {
 
   # The digesting configuration of server
   toml-config = toml.generate "config.toml" {
-    server.port = toString cfg.port;
+    app.port = toString cfg.port;
     spring.datasource.url = "#databaseUrl#";
     github = {
       client-id = "#ghcid#";
