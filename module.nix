@@ -55,7 +55,8 @@ flake: {
       };
       "*.${cfg.proxy-reverse.domain}" = {
         addSSL = true;
-        useACMEHost = "${cfg.proxy-reverse.domain}";
+        # useACMEHost = "${cfg.proxy-reverse.domain}";
+        enableACME = true;
         locations."/" = {
           proxyPass = "http://127.0.0.1:${toString cfg.port}";
           proxyWebsockets = true;
