@@ -26,7 +26,7 @@ public class FrontController {
     @GetMapping("/github")
     public RedirectView redirectToGithub() {
         return new RedirectView(String.format(
-                "https://github.com/login/oauth/authorize?client_id=%s&redirect_uri=%s&scope=user",
+                "https://github.com/login/oauth/authorize?client_id=%s&redirect_uri=%s&scope=user:email",
                 clientId,
                 redirectUri
         ));
