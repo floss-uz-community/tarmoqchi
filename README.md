@@ -1,4 +1,4 @@
-![banner](https://pub-4e4118614197441ca01a142347434959.r2.dev/tarmoqchi-banner.png)
+![banner](https://pub-4e4118614197441ca01a142347434959.r2.dev/Screenshot%202025-05-03%20at%2001.19.16.png)
 
 # Tarmoqchi - The HTTP Tunneling Tool 
 
