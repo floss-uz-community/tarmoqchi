@@ -49,4 +49,4 @@ tarmoqchi --version
 # Display help information
 tarmoqchi --help
 ```
-© 2025 Tarmoqchi. All rights reserved.
+![footer-banner](https://pub-4e4118614197441ca01a142347434959.r2.dev/Screenshot%202025-05-03%20at%2001.20.13.png)
