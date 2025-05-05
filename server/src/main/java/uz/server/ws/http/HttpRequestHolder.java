@@ -1,4 +1,4 @@
-package uz.server.ws;
+package uz.server.ws.http;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,7 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class RequestHolder {
+public class HttpRequestHolder {
     private static final ConcurrentHashMap<String, CompletableFuture<Response>> requests = new ConcurrentHashMap<>();
 
     public void add(String id, CompletableFuture<Response> future) {

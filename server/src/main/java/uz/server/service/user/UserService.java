@@ -1,4 +1,4 @@
-package uz.server.service;
+package uz.server.service.user;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -44,13 +44,6 @@ public class UserService {
 
     public void authorize(String token) {
         User user = authorizeSessionWithToken(token);
-
-        if (Boolean.TRUE.equals(user.getConnectedToCLI())) {
-            log.error("User already connected to CLI: userId={}", user.getId());
-            throw new BaseException("User already connected to CLI!");
-        }
-
-        user.setConnectedToCLI(true);
         userRepository.save(user);
         log.info("User connected to CLI successfully: userId={}", user.getId());
     }
@@ -63,11 +56,6 @@ public class UserService {
     public Optional<User> findById(Long id) {
         log.debug("Fetching user by ID: {}", id);
         return userRepository.findById(id);
-    }
-
-    public void update(User user) {
-        log.info("Updating user: userId={}", user.getId());
-        userRepository.save(user);
     }
 
     @Transactional

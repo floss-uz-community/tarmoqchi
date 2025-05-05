@@ -1,6 +1,8 @@
 package uz.server.config;
 
 public class Settings {
+    public static final String HOST = "tarmoqchi.uz";
+
     public static String NOT_RUNNING_APP_OF_CLIENT_HTML = """
             <!DOCTYPE html>
                    <html lang="en">

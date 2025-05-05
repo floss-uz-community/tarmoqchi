@@ -1,24 +1,19 @@
-package uz.server.domain.entity;
+package uz.server.domain.basemodels;
 
 import jakarta.persistence.*;
 import lombok.*;
-
-@Entity(name = "tunnels")
+import uz.server.domain.entity.User;
 
 @Getter
 @Setter
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
-public class Tunnel {
+@MappedSuperclass
+public abstract class Tunnel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "session_id")
     private String sessionId;
-
-    private String subdomain;
 
     @ManyToOne
     private User user;

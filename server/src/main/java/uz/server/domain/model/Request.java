@@ -3,8 +3,6 @@ package uz.server.domain.model;
 import lombok.*;
 import uz.server.domain.enums.RequestType;
 
-import java.util.Map;
-
 @Getter
 @Setter
 @AllArgsConstructor
@@ -13,7 +11,8 @@ import java.util.Map;
 public class Request {
     private String id;
     private RequestType type;
-    private TunnelInfo tunnelInfo;
+    private TunnelData tunnelData;
     private ForwardInfo forwardInfo;
     private String error;
+    private boolean shutDown;
 }

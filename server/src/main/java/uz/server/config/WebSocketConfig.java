@@ -7,18 +7,25 @@ import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
 import org.springframework.web.socket.server.standard.ServletServerContainerFactoryBean;
-import uz.server.ws.ConnectionHandler;
+import uz.server.ws.http.HttpConnectionHandler;
+import uz.server.ws.tcp.TcpConnectionHandler;
 
 @Configuration
 @EnableWebSocket
 @RequiredArgsConstructor
 public class WebSocketConfig implements WebSocketConfigurer {
-    private final ConnectionHandler handler;
+    private final HttpConnectionHandler httpConnectionHandler;
     private final AuthHandshakeInterceptor authHandshakeInterceptor;
+    private final TcpConnectionHandler tcpConnectionHandler;
+
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(handler, "/server")
+        registry.addHandler(tcpConnectionHandler, "/server/tcp")
+                .setAllowedOrigins("*")
+                .addInterceptors(authHandshakeInterceptor);
+
+        registry.addHandler(httpConnectionHandler, "/server/http")
                 .setAllowedOrigins("*")
                 .addInterceptors(authHandshakeInterceptor);
     }

@@ -40,10 +40,4 @@ public class User {
     @Column(name = "created_at")
     @CreationTimestamp
     private LocalDateTime createdAt;
-
-    @Column(name = "remaining_requests")
-    private Integer remainingRequests;
-
-    @Column(name = "connected_to_cli")
-    private Boolean connectedToCLI;
 }

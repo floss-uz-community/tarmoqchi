@@ -31,6 +31,35 @@
 	</properties>
 
 	<dependencies>
+		<!-- https://mvnrepository.com/artifact/io.netty/netty-transport -->
+		<dependency>
+			<groupId>io.netty</groupId>
+			<artifactId>netty-transport</artifactId>
+			<version>4.2.0.Final</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/io.netty/netty-handler -->
+		<dependency>
+			<groupId>io.netty</groupId>
+			<artifactId>netty-handler</artifactId>
+			<version>4.2.0.Final</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/io.netty/netty-common -->
+		<dependency>
+			<groupId>io.netty</groupId>
+			<artifactId>netty-common</artifactId>
+			<version>4.2.0.Final</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/io.netty/netty-buffer -->
+		<!-- https://mvnrepository.com/artifact/io.netty/netty-buffer -->
+		<dependency>
+			<groupId>io.netty</groupId>
+			<artifactId>netty-buffer</artifactId>
+			<version>4.2.0.Final</version>
+		</dependency>
+
 		<dependency>
 			<groupId>com.moandjiezana.toml</groupId>
 			<artifactId>toml4j</artifactId>

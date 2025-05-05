@@ -3,7 +3,7 @@ package uz.server.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import uz.server.domain.dto.request.AuthRequest;
-import uz.server.service.UserService;
+import uz.server.service.user.UserService;
 
 @RestController
 @RequiredArgsConstructor

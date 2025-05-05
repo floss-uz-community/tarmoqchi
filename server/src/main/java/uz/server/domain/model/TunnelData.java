@@ -7,6 +7,6 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class TunnelInfo {
+public class TunnelData {
     private String message;
 }

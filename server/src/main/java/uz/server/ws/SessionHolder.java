@@ -12,17 +12,17 @@ import java.util.concurrent.ConcurrentHashMap;
 public class SessionHolder {
     public static ConcurrentHashMap<String, WebSocketSession> sessions = new ConcurrentHashMap<>();
 
-    public void addSession(String id, WebSocketSession session) {
+    public void add(String id, WebSocketSession session) {
         log.info("Adding session with id: {}", id);
         sessions.put(id, session);
     }
 
-    public WebSocketSession getSession(String id) {
+    public WebSocketSession get(String id) {
         log.info("Getting session with id: {}", id);
         return sessions.get(id);
     }
 
-    public void removeSession(String id) {
+    public void remove(String id) {
         log.info("Removing session with id: {}", id);
         WebSocketSession remove = sessions.remove(id);
 
@@ -35,7 +35,7 @@ public class SessionHolder {
         }
     }
 
-    public boolean hasSession(String id) {
+    public boolean has(String id) {
         log.info("Checking session with id: {}", id);
         return sessions.containsKey(id);
     }
