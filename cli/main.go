@@ -13,6 +13,7 @@ import (
 	"strings"
 	"sync"
 	"time"
+	"regexp"
 
 	"github.com/gorilla/websocket"
 )
@@ -20,7 +21,7 @@ import (
 const (
 	wsDomain   = "wss://tarmoqchi.uz/server"
 	httpDomain = "https://tarmoqchi.uz"
-	version    = "Tarmoqchi CLI v2.0.1"
+	version    = "Tarmoqchi CLI v2.0.2"
 )
 
 // RequestType enum
@@ -264,7 +265,20 @@ func createTunnel(port string, customSubdomain string) {
 	// Create header for WebSocket connection
 	header := http.Header{}
 	header.Add("Authorization", "Bearer "+token)
-	header.Add("Custom-Subdomain", customSubdomain)
+
+	validSubdomain := regexp.MustCompile(`^[a-zA-Z0-9]+$`)
+	if customSubdomain != "" {
+		if len(customSubdomain) > 63 {
+			printError("Subdomain is too long. Max length is 63 characters.")
+			return
+		}
+
+		if !validSubdomain.MatchString(customSubdomain) {
+			printError("Invalid subdomain format. Only alphanumeric characters are allowed.")
+			return
+		}
+		header.Add("Custom-Subdomain", customSubdomain)
+	}
 
 	// Connect to WebSocket
 	c, _, err := websocket.DefaultDialer.Dial(wsDomain, header)
