@@ -3,26 +3,19 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Tarmoqchi.uz - HTTP tunneling uchun qulay va xavfsiz yechim" />
-    <meta name="keywords" content="Tarmoqchi, HTTP tunneling, Secure tunneling, GitHub integration" />
-    <title>Tarmoqchi.uz</title>
-    <link
-            rel="stylesheet"
-            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
-            integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA=="
-            crossorigin="anonymous"
-            referrerpolicy="no-referrer"
-    />
+    <meta name="description" content="Tarmoqchi - HTTP tunneling tool for exposing local services to the internet" />
+    <meta name="keywords" content="Tarmoqchi, HTTP tunneling, CLI tool, local server" />
+    <title>Tarmoqchi - HTTP Tunneling Tool</title>
     <style>
         :root {
             --primary-color: black;
             --hover-color: #525456;
             --secondary-hover: #6c757d;
-            --border-color: black;
+            --border-color: #e1e4e8;
             --background-light: #f8f9fa;
             --font-primary: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
             Helvetica, Arial, sans-serif;
-            --border-radius: 10px;
+            --border-radius: 4px;
             --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             --transition: all 0.2s ease;
         }
@@ -36,30 +29,22 @@
         body {
             font-family: var(--font-primary);
             line-height: 1.6;
-            background-color: #f5f5f5;
+            color: var(--primary-color);
+            background-color: white;
         }
 
         .all {
-            position: relative;
-            left: 20%;
-            width: 60%;
+            max-width: 700px;
             min-height: 100vh;
-            border: 1px solid var(--border-color);
-            padding: 20px;
-            border-radius: var(--border-radius);
-            background: white;
-            margin: 40px 0;
-            box-shadow: var(--box-shadow);
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
         }
 
-        .banner-box {
-            background-image: url(https://pub-4e4118614197441ca01a142347434959.r2.dev/tarmoqchi-banner.png);
-            margin-bottom: 20px;
-            height: 200px;
-            background-size: cover;
-            background-position: top left;
-            border-radius: 20px;
-            box-shadow: var(--box-shadow);
+        .banner-img {
+            width: 100%;
+            height: auto;
+            margin-bottom: 2rem;
+            border-radius: var(--border-radius);
         }
 
         /* Navbar */
@@ -67,27 +52,29 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px 0;
+            padding: 1rem 0;
+            margin-bottom: 2rem;
             border-bottom: 1px solid var(--border-color);
-            margin-bottom: 30px;
         }
 
         .logo {
-            height: 40px;
-            width: auto;
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            text-decoration: none;
         }
 
         .login-button {
             background: var(--primary-color);
             color: white;
             border: none;
-            padding: 8px 16px;
-            border-radius: 4px;
+            padding: 0.5rem 1rem;
+            border-radius: var(--border-radius);
             cursor: pointer;
-            font-size: 14px;
+            font-size: 0.875rem;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 0.5rem;
             text-decoration: none;
             transition: var(--transition);
         }
@@ -100,15 +87,14 @@
         .profile {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 1rem;
         }
 
         .profile-avatar {
-            width: 32px;
-            height: 32px;
+            width: 2rem;
+            height: 2rem;
             border-radius: 50%;
             object-fit: cover;
-            border: 1px solid #ddd;
         }
 
         .profile-info {
@@ -117,93 +103,91 @@
         }
 
         .profile-name {
-            font-size: 14px;
+            font-size: 0.875rem;
             font-weight: 500;
-            color: black;
         }
 
         .profile-email {
-            font-size: 12px;
-            color: #333;
+            font-size: 0.75rem;
+            color: #666;
         }
 
         .logout-button {
             background: var(--primary-color);
             color: white;
             border: none;
-            padding: 6px 12px;
-            border-radius: 4px;
+            padding: 0.375rem 0.75rem;
+            border-radius: var(--border-radius);
             cursor: pointer;
-            font-size: 14px;
+            font-size: 0.875rem;
             text-decoration: none;
             transition: var(--transition);
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
         }
 
         .logout-button:hover {
             background: var(--secondary-hover);
         }
 
-        /* Section */
-        .section {
-            margin-bottom: 40px;
-            padding-bottom: 30px;
-            border-bottom: 1px solid var(--border-color);
+        /* Main content */
+        main {
+            margin-bottom: 3rem;
         }
 
-        .section:last-child {
-            border-bottom: none;
-            padding-bottom: 0;
+        section {
+            margin-bottom: 2.5rem;
         }
 
-        .section-title {
-            font-size: 24px;
+        h1 {
+            font-size: 2.25rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+        }
+
+        h2 {
+            font-size: 1.5rem;
             font-weight: 600;
-            margin-bottom: 20px;
-            color: black;
+            margin-bottom: 1rem;
         }
 
-        .section-content {
-            color: black;
-            margin-bottom: 20px;
-            font-size: 20px;
+        p {
+            margin-bottom: 1.5rem;
+            font-size: 1.125rem;
         }
 
         /* Token section */
         .token-container {
             background: var(--background-light);
             border: 1px solid var(--border-color);
-            border-radius: 6px;
-            padding: 20px;
-            margin-top: 20px;
+            border-radius: var(--border-radius);
+            padding: 1.25rem;
+            margin-top: 1.25rem;
+            margin-bottom: 2rem;
         }
 
         .token-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
+            margin-bottom: 1rem;
         }
 
         .token-title {
-            font-size: 16px;
+            font-size: 1rem;
             font-weight: 500;
-            color: black;
         }
 
         .copy-button {
             background: var(--primary-color);
             color: white;
             border: none;
-            padding: 8px 16px;
-            border-radius: 4px;
+            padding: 0.5rem 1rem;
+            border-radius: var(--border-radius);
             cursor: pointer;
-            font-size: 14px;
+            font-size: 0.875rem;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 0.5rem;
             transition: var(--transition);
         }
 
@@ -214,20 +198,18 @@
         .token-value {
             background: white;
             border: 1px solid var(--border-color);
-            padding: 15px;
-            border-radius: 4px;
+            padding: 0.75rem;
+            border-radius: var(--border-radius);
             font-family: monospace;
-            color: black;
             word-break: break-all;
-            margin-bottom: 15px;
+            margin-bottom: 1rem;
             user-select: all;
-            white-space: nowrap;
             overflow-x: auto;
         }
 
         .token-description {
-            font-size: 14px;
-            color: black;
+            font-size: 0.875rem;
+            color: #666;
         }
 
         /* Features */
@@ -238,14 +220,9 @@
         .feature-item {
             display: flex;
             align-items: flex-start;
-            gap: 16px;
-            padding: 16px 0;
+            gap: 1rem;
+            padding: 1rem 0;
             border-bottom: 1px solid var(--border-color);
-            transition: var(--transition);
-        }
-
-        .feature-item:hover {
-            background-color: rgba(0, 0, 0, 0.02);
         }
 
         .feature-item:last-child {
@@ -254,304 +231,293 @@
 
         .feature-icon {
             color: var(--primary-color);
-            font-size: 20px;
-            padding-top: 2px;
-            min-width: 24px;
+            font-size: 1.25rem;
+            min-width: 1.5rem;
             text-align: center;
         }
 
         .feature-content h3 {
-            font-size: 18px;
+            font-size: 1.125rem;
             font-weight: 500;
-            margin-bottom: 8px;
-            color: black;
+            margin-bottom: 0.5rem;
         }
 
         .feature-content p {
-            font-size: 14px;
-            color: #333;
-            line-height: 1.5;
+            font-size: 0.875rem;
+            color: #666;
+            margin-bottom: 0;
+        }
+
+        /* Code blocks */
+        code {
+            font-family: monospace;
+            background-color: var(--background-light);
+            padding: 0.2rem 0.4rem;
+            border-radius: var(--border-radius);
+            font-size: 0.875rem;
+        }
+
+        pre {
+            background-color: var(--background-light);
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            overflow-x: auto;
+            margin-bottom: 1.5rem;
+        }
+
+        pre code {
+            background-color: transparent;
+            padding: 0;
+            font-size: 0.875rem;
+            display: block;
         }
 
         /* GitHub section */
         .github-section {
             text-align: center;
-            padding: 20px 0 30px;
+            padding: 2rem 0;
+            margin-top: 2rem;
+            border-top: 1px solid var(--border-color);
         }
 
         .github-link {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
+            gap: 0.5rem;
             background: var(--primary-color);
             color: white;
             text-decoration: none;
-            padding: 12px 24px;
-            border-radius: 4px;
-            font-size: 16px;
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
             transition: var(--transition);
         }
 
         .github-link:hover {
-            background: #495057;
+            background: var(--hover-color);
             transform: translateY(-2px);
         }
 
         /* Footer */
         footer {
             text-align: center;
-            padding: 20px 0;
+            padding: 2rem 0 1rem;
             border-top: 1px solid var(--border-color);
+            color: #666;
+            font-size: 0.875rem;
         }
 
-        .copyright {
-            font-size: 14px;
-            color: #6c757d;
-            margin-bottom: 5px;
+        details {
+            margin-bottom: 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
         }
 
-        .copyright a {
-            color: black;
-            text-decoration: none;
-            transition: var(--transition);
+        summary {
+            padding: 0.75rem;
+            cursor: pointer;
+            font-weight: 500;
         }
 
-        .copyright a:hover {
-            color: #6c757d;
-            text-decoration: underline;
+        details > div {
+            padding: 0 0.75rem 0.75rem;
         }
 
         /* Responsive */
-        @media (max-width: 1200px) {
-            .all {
-                left: 10%;
-                width: 80%;
-            }
-        }
-
-        @media (max-width: 992px) {
-            .all {
-                left: 5%;
-                width: 90%;
-            }
-        }
-
         @media (max-width: 768px) {
             .all {
-                left: 0;
-                width: 95%;
-                margin: 20px auto;
-                padding: 15px;
-                border-radius: 8px;
-            }
-
-            .banner-box {
-                height: 150px;
-                border-radius: 15px;
+                padding: 1.5rem 1rem;
             }
 
             nav {
                 flex-direction: column;
-                gap: 15px;
                 align-items: flex-start;
+                gap: 1rem;
             }
 
             .profile {
                 width: 100%;
-                justify-content: space-between;
+                flex-wrap: wrap;
+            }
+
+            h1 {
+                font-size: 1.75rem;
+            }
+
+            h2 {
+                font-size: 1.25rem;
+            }
+
+            p {
+                font-size: 1rem;
             }
 
             .token-header {
                 flex-direction: column;
                 align-items: flex-start;
-                gap: 10px;
-            }
-
-            .token-value {
-                font-size: 12px;
-            }
-
-            .feature-item {
-                padding: 12px 0;
-            }
-
-            .section-content {
-                font-size: 16px;
-            }
-
-            .section-title {
-                font-size: 20px;
+                gap: 0.75rem;
             }
         }
 
-        @media (max-width: 576px) {
+        @media (max-width: 480px) {
             .all {
-                padding: 10px;
-                margin: 10px auto;
+                padding: 1rem 0.75rem;
             }
 
-            .banner-box {
-                height: 120px;
-                border-radius: 10px;
-                margin-bottom: 15px;
+            h1 {
+                font-size: 1.5rem;
             }
 
-            nav {
-                padding: 10px 0;
-                margin-bottom: 20px;
-            }
-
-            .profile {
-                flex-wrap: wrap;
-                gap: 10px;
-            }
-
-            .profile-info {
-                flex: 1;
-                min-width: 150px;
-            }
-
-            .section {
-                margin-bottom: 30px;
-                padding-bottom: 20px;
-            }
-
-            .github-link {
-                padding: 10px 20px;
-                font-size: 14px;
+            .feature-item {
+                flex-direction: column;
+                gap: 0.5rem;
             }
 
             .feature-icon {
-                font-size: 18px;
-            }
-
-            .feature-content h3 {
-                font-size: 16px;
-            }
-
-            .feature-content p {
-                font-size: 13px;
-            }
-
-            .token-container {
-                padding: 15px;
+                font-size: 1.5rem;
             }
         }
     </style>
 </head>
 <body>
 <div class="all">
-    <div class="banner-box" role="banner"></div>
-
     <nav>
-        <img
-                src="https://pub-efb2bbde7206420692920475ba73046f.r2.dev/logo.png"
-                alt="Tarmoqchi Logo"
-                class="logo"
-                loading="lazy"
-        />
+        <a href="/" class="logo" aria-label="Tarmoqchi Home">Tarmoqchi</a>
 
         <div th:if="${user == null}">
             <a href="/front/github" class="login-button" aria-label="Login with GitHub">
-                <i class="fab fa-github" aria-hidden="true"></i> Login with GitHub
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"></path><path d="M9 18c-4.51 2-5-2-7-2"></path></svg>
+                Login with GitHub
             </a>
         </div>
 
         <div th:if="${user != null}" class="profile">
-            <img
-                    th:src="${user.avatarUrl}"
-                    alt="User Avatar"
-                    class="profile-avatar"
-                    loading="lazy"
-            />
+            <img th:src="${user.avatarUrl}" alt="User Avatar" class="profile-avatar" loading="lazy" />
             <div class="profile-info">
                 <span class="profile-name" th:text="${user.name}">Username</span>
-                <span class="profile-email" th:text="${user.email}"
-                >user@example.com</span
-                >
+                <span class="profile-email" th:text="${user.email}">user@example.com</span>
             </div>
             <a href="/front/logout" class="logout-button" aria-label="Logout">
-                <i class="fas fa-sign-out-alt" aria-hidden="true"></i> Logout
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                Logout
             </a>
         </div>
     </nav>
 
-    <!-- About Section -->
-    <section class="section">
-        <div class="section-content">
+    <main>
+        <img src="https://pub-4e4118614197441ca01a142347434959.r2.dev/Screenshot%202025-05-03%20at%2001.19.16.png" alt="Tarmoqchi Banner" class="banner-img" loading="lazy" />
+
+        <section>
+            <h1>Tarmoqchi - The HTTP Tunneling Tool</h1>
             <p>
-                Tarmoqchi - the powerful, secure and efficient solution for HTTP tunneling. Create
-                secure tunnels to expose your local services to the internet with
-                ease.
+                Tarmoqchi is a powerful CLI tool that allows you to expose your local server to the internet easily.
+                With Tarmoqchi, you can access your local services from anywhere, without complex configurations or setups.
             </p>
-        </div>
-    </section>
+        </section>
 
-    <!-- Token Section (only shown when logged in) -->
-    <section th:if="${user != null && user.token != null}" class="section">
-        <h2 class="section-title">Your Authentication Token</h2>
-        <div class="token-container">
-            <div class="token-header">
-                <h3 class="token-title">Use this token with Tarmoqchi CLI</h3>
-                <button class="copy-button" onclick="copyToken()" aria-label="Copy token">
-                    <i class="fas fa-copy" aria-hidden="true"></i> Copy
-                </button>
+        <!-- Token Section (only shown when logged in) -->
+        <section th:if="${user != null && user.token != null}">
+            <h2>Your Authentication Token</h2>
+            <div class="token-container">
+                <div class="token-header">
+                    <h3 class="token-title">Use this token with Tarmoqchi CLI</h3>
+                    <button class="copy-button" onclick="copyToken()" aria-label="Copy token">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg>
+                        Copy
+                    </button>
+                </div>
+                <div class="token-value" id="authTokenValue" th:text="${user.token}" tabindex="0">
+                    YOUR_AUTH_TOKEN_HERE
+                </div>
+                <p class="token-description">
+                    This token is associated with your GitHub account. Use it to authenticate your Tarmoqchi CLI.
+                </p>
             </div>
-            <div class="token-value" id="authTokenValue" th:text="${user.token}" tabindex="0">
-                YOUR_AUTH_TOKEN_HERE
-            </div>
-            <p class="token-description">
-                This token is associated with your GitHub account and will be valid
-                until you logout. Keep it secure.
-            </p>
-        </div>
-    </section>
+        </section>
 
-    <!-- Features Section -->
-    <section class="section">
-        <h2 class="section-title">Features</h2>
-        <ul class="features-list">
-            <li class="feature-item">
-                <i class="fa fa-link feature-icon" aria-hidden="true"></i>
-                <div class="feature-content">
-                    <h3>Secure Tunneling</h3>
-                    <p>Connect your local services to the internet with ease.</p>
-                </div>
-            </li>
-            <li class="feature-item">
-                <i class="fa fa-bolt feature-icon" aria-hidden="true"></i>
-                <div class="feature-content">
-                    <h3>Blazing Fast</h3>
-                    <p>Experience high-speed, low-latency connections.</p>
-                </div>
-            </li>
-            <li class="feature-item">
-                <i class="fa fa-lock feature-icon" aria-hidden="true"></i>
-                <div class="feature-content">
-                    <h3>Authentication</h3>
-                    <p>Secure your tunnel with token-based authentication.</p>
-                </div>
-            </li>
-        </ul>
-    </section>
+        <section>
+            <h2>Installation and Usage</h2>
 
-    <!-- GitHub Section -->
-    <section class="github-section">
-        <a
-                href="https://github.com/jamshid-elmurodov/tarmoqchi"
-                target="_blank"
-                rel="noopener"
-                class="github-link"
-                aria-label="View Tarmoqchi on GitHub"
-        >
-            <i class="fab fa-github" aria-hidden="true"></i> View on GitHub
-        </a>
-    </section>
+            <details>
+                <summary>Installation for macOS and Linux</summary>
+                <div>
+                    <pre><code>curl -fsSL https://github.com/jamshid-elmurodov/tarmoqchi/releases/download/Tarmoqchi-2.0.0/install.sh | sudo bash</code></pre>
+                </div>
+            </details>
 
-    <!-- Footer -->
+            <details>
+                <summary>Installation for Windows</summary>
+                <div>
+                    <p>Download the latest exe from the <a href="https://github.com/floss-uz-community/tarmoqchi/releases/tag/Tarmoqchi-2.0.0" target="_blank" rel="noopener noreferrer">release page</a>.</p>
+                </div>
+            </details>
+
+            <h3>Basic Usage</h3>
+            <p>First, obtain your personal auth token by logging in at <a href="https://tarmoqchi.uz/">tarmoqchi.uz</a></p>
+            <pre><code>tarmoqchi --auth &lt;AUTH_TOKEN&gt;</code></pre>
+
+            <p>Expose your local service to the internet:</p>
+            <pre><code>tarmoqchi --port &lt;YOUR_PORT&gt;</code></pre>
+
+            <p>You can also specify a custom subdomain:</p>
+            <pre><code>tarmoqchi --port &lt;YOUR_PORT&gt; --sd &lt;YOUR_SUBDOMAIN&gt;</code></pre>
+
+            <p><strong>You can stop the tunnel by pressing Ctrl + C in the terminal.</strong></p>
+        </section>
+
+        <section>
+            <h2>Features</h2>
+            <ul class="features-list">
+                <li class="feature-item">
+                    <div class="feature-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+                    </div>
+                    <div class="feature-content">
+                        <h3>Secure Tunneling</h3>
+                        <p>Expose your local server to the internet easily and securely.</p>
+                    </div>
+                </li>
+                <li class="feature-item">
+                    <div class="feature-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg>
+                    </div>
+                    <div class="feature-content">
+                        <h3>Blazing Fast</h3>
+                        <p>Experience high-speed, low-latency connections for your local services.</p>
+                    </div>
+                </li>
+                <li class="feature-item">
+                    <div class="feature-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                    </div>
+                    <div class="feature-content">
+                        <h3>Authentication</h3>
+                        <p>Secure your tunnel with token-based authentication via GitHub.</p>
+                    </div>
+                </li>
+                <li class="feature-item">
+                    <div class="feature-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                    </div>
+                    <div class="feature-content">
+                        <h3>Custom Subdomains</h3>
+                        <p>Choose your own subdomain for easier access to your services.</p>
+                    </div>
+                </li>
+            </ul>
+        </section>
+
+        <section class="github-section">
+            <a href="https://github.com/jamshid-elmurodov/tarmoqchi" target="_blank" rel="noopener noreferrer" class="github-link" aria-label="View Tarmoqchi on GitHub">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"></path><path d="M9 18c-4.51 2-5-2-7-2"></path></svg>
+                View on GitHub
+            </a>
+        </section>
+    </main>
+
     <footer>
-        <p class="copyright">&copy; <span id="currentYear">2025</span> Tarmoqchi. All rights reserved.</p>
-        <p class="copyright">Powered by <a href="https://floss.uz" target="_blank" rel="noopener">floss.uz</a></p>
+        <p>&copy; <span id="currentYear">2025</span> Tarmoqchi. All rights reserved.</p>
+        <p>Powered by <a href="https://floss.uz" target="_blank" rel="noopener noreferrer">floss.uz</a></p>
     </footer>
 </div>
 
@@ -569,7 +535,7 @@
             navigator.clipboard
                 .writeText(token)
                 .then(() => {
-                    copyBtn.innerHTML = '<i class="fas fa-check" aria-hidden="true"></i> Copied';
+                    copyBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg> Copied';
                     copyBtn.style.backgroundColor = "#28a745";
 
                     setTimeout(() => {
@@ -602,10 +568,10 @@
         try {
             const successful = document.execCommand('copy');
             if (successful) {
-                copyBtn.innerHTML = '<i class="fas fa-check" aria-hidden="true"></i> Copied';
+                copyBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg> Copied';
                 copyBtn.style.backgroundColor = "#28a745";
             } else {
-                copyBtn.innerHTML = '<i class="fas fa-times" aria-hidden="true"></i> Failed';
+                copyBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg> Failed';
                 copyBtn.style.backgroundColor = "#dc3545";
             }
         } catch (err) {
