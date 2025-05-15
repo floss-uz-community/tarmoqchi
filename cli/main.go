@@ -51,14 +51,14 @@ type TunnelInfo struct {
 }
 
 type Response struct {
-	ID           string       `json:"requestId"`
-	StatusCode   int          `json:"status"`
-	Body         string       `json:"body"`
-	Last         bool         `json:"last"`
-	ResponseType ResponseType `json:"responseType"`
+	ID           string            `json:"requestId"`
+	StatusCode   int               `json:"status"`
+	Body         string            `json:"body"`
+	Last         bool              `json:"last"`
+	ResponseType ResponseType      `json:"responseType"`
+	Headers      map[string]string `json:"headers"`
 }
 
-// Request represents a request from the server
 type Request struct {
 	ID          string       `json:"id"`
 	Type        RequestType  `json:"type"`
@@ -136,11 +136,11 @@ func (wsm *WebSocketManager) Close() {
 }
 
 func main() {
-	// Define command line flags
 	portFlag := flag.String("port", "", "Local port to forward requests")
 	authFlag := flag.String("auth", "", "Authentication token")
 	helpFlag := flag.Bool("help", false, "Show help information")
 	versionFlag := flag.Bool("version", false, "Show version information")
+	customSubdomainFlag := flag.String("sd", "", "Custom subdomain for the tunnel")
 
 	// Parse command line arguments
 	flag.Parse()
@@ -160,7 +160,7 @@ func main() {
 	if *authFlag != "" {
 		authorize(*authFlag)
 	} else if *portFlag != "" {
-		createTunnel(*portFlag)
+		createTunnel(*portFlag, *customSubdomainFlag)
 	} else {
 		printError("Command not recognized.")
 		printHelp()
@@ -176,6 +176,7 @@ func printHelp() {
 	fmt.Println("  --auth <token>   Authentication token")
 	fmt.Println("  --help           Show help information")
 	fmt.Println("  --version        Show version information")
+	fmt.Println("  --sd <subdomain> Custom subdomain for the tunnel")
 }
 
 func printTarmoqchi() {
@@ -240,7 +241,7 @@ func authorize(auth string) {
 	}
 }
 
-func createTunnel(port string) {
+func createTunnel(port string, customSubdomain string) {
 	printTarmoqchi()
 	printInfo("Attempting to establish a tunnel...")
 
@@ -263,6 +264,7 @@ func createTunnel(port string) {
 	// Create header for WebSocket connection
 	header := http.Header{}
 	header.Add("Authorization", "Bearer "+token)
+	header.Add("Custom-Subdomain", customSubdomain)
 
 	// Connect to WebSocket
 	c, _, err := websocket.DefaultDialer.Dial(wsDomain, header)
@@ -459,6 +461,7 @@ func requestSender(request *Request, wsManager *WebSocketManager, localPort stri
 				Body:         chunk,
 				Last:         last,
 				ResponseType: ResponseChunk,
+				Headers:      flattenHeaders(resp.Header),
 			}
 
 			responseJSON, err := json.Marshal(response)
@@ -478,6 +481,7 @@ func requestSender(request *Request, wsManager *WebSocketManager, localPort stri
 			Body:         responseBody,
 			Last:         true,
 			ResponseType: ResponseChunk,
+			Headers:      flattenHeaders(resp.Header),
 		}
 
 		responseJSON, err := json.Marshal(response)
@@ -490,6 +494,16 @@ func requestSender(request *Request, wsManager *WebSocketManager, localPort stri
 		// Use WebSocketManager for thread-safe writing
 		wsManager.Write(responseJSON)
 	}
+}
+
+func flattenHeaders(h http.Header) map[string]string {
+	flat := make(map[string]string)
+	for key, values := range h {
+		if len(values) > 0 {
+			flat[key] = values[0] // faqat birinchi qiymatini olamiz
+		}
+	}
+	return flat
 }
 
 // Print functions
