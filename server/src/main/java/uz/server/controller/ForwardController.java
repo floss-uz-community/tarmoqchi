@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uz.server.domain.enums.RequestType;
@@ -67,7 +68,10 @@ public class ForwardController {
                 .build());
 
         log.info("Response received with status: {}", response.getStatus());
-        return ResponseEntity.status(response.getStatus()).body(response.getBody());
+
+        HttpHeaders httpHeaders = new HttpHeaders();
+        response.getHeaders().forEach(httpHeaders::add);
+        return ResponseEntity.status(response.getStatus()).headers(httpHeaders).body(response.getBody());
     }
 
     private static String getSubdomain(String host) {
