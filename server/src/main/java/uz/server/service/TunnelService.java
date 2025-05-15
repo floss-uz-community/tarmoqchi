@@ -10,6 +10,7 @@ import uz.server.domain.exception.BaseException;
 import uz.server.repository.TunnelRepository;
 
 import java.security.SecureRandom;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -18,7 +19,7 @@ import java.util.Optional;
 public class TunnelService {
     private final TunnelRepository repo;
 
-    public String create(String sessionId, User user) {
+    public String create(String sessionId, User user, String customSubdomain) {
         log.info("Creating tunnel: userId={}", user.getId());
         Integer count = repo.countByUser(user);
 
@@ -27,9 +28,14 @@ public class TunnelService {
             throw new BaseException("You can't create more than 3 tunnels!");
         }
 
+        if (customSubdomain != null && repo.existsBySubdomain(customSubdomain)){
+            log.error("Subdomain already exists: subdomain={}", customSubdomain);
+            throw new BaseException("Subdomain already exists!");
+        }
+
         Tunnel save = repo.save(Tunnel.builder()
                 .sessionId(sessionId)
-                .subdomain(generateUniqueString())
+                .subdomain(Objects.requireNonNullElse(customSubdomain, generateUniqueString()))
                 .user(user)
                 .build());
 
@@ -44,10 +50,12 @@ public class TunnelService {
         SecureRandom RANDOM = new SecureRandom();
 
         sb.append(timestamp);
+
         for (int i = 0; i < 8; i++) {
             String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
             sb.append(CHARACTERS.charAt(RANDOM.nextInt(CHARACTERS.length())));
         }
+
         return sb.toString();
     }
 
