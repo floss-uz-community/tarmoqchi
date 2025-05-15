@@ -20,7 +20,7 @@ import (
 const (
 	wsDomain   = "wss://tarmoqchi.uz/server"
 	httpDomain = "https://tarmoqchi.uz"
-	version    = "Tarmoqchi CLI v1.1.1"
+	version    = "Tarmoqchi CLI v2.0.0"
 )
 
 // RequestType enum
