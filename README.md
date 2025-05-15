@@ -2,11 +2,15 @@
 
 <h2 align="center">Tarmoqchi - The HTTP Tunneling Tool</h2>
 
+---
+
 ### Feature Overview
 - Expose your local server to the internet easily.
 - Access your local services from anywhere.
 - No need for complex configurations or setups.
 - Simple command-line interface.
+
+---
 
 ### Installation and updating
 <details>
@@ -20,6 +24,8 @@ curl -fsSL https://github.com/jamshid-elmurodov/tarmoqchi/releases/download/Tarm
 <summary>Windows</summary>
 Download the latest exe from the [release page](https://github.com/floss-uz-community/tarmoqchi/releases/tag/Tarmoqchi-2.0.0)
 </details>
+
+---
 
 ### Usage
 
@@ -41,6 +47,8 @@ Replace `YOUR_SUBDOMAIN` with the desired subdomain name. For example:
 ```
 tarmoqchi --port 8080 --sd mycustomsubdomain
 ```
+
+---
 
 ### Other Options
 Show version information
