@@ -6,6 +6,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import uz.server.domain.enums.ResponseType;
 
+import java.util.Map;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -16,4 +18,5 @@ public class Response {
     private String body;
     private boolean last;
     private ResponseType responseType;
+    private Map<String, String> headers;
 }

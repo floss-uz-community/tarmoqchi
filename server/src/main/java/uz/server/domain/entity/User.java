@@ -7,6 +7,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+import uz.server.domain.dto.GithubUserDTO;
 
 import java.time.LocalDateTime;
 
@@ -31,19 +32,17 @@ public class User {
     @Column(name = "avatar_url")
     private String avatarUrl;
 
-    @JsonProperty("html_url")
-    @Column(name = "github_profile")
-    private String githubProfile;
-
     private String token;
 
     @Column(name = "created_at")
     @CreationTimestamp
     private LocalDateTime createdAt;
 
-    @Column(name = "remaining_requests")
-    private Integer remainingRequests;
-
-    @Column(name = "connected_to_cli")
-    private Boolean connectedToCLI;
+    public static User from(GithubUserDTO dto) {
+        return User.builder()
+                .name(dto.name())
+                .email(dto.email())
+                .avatarUrl(dto.avatar_url())
+                .build();
+    }
 }

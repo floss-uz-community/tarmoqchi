@@ -14,4 +14,10 @@ public class RestExceptionHandler {
         log.error("BaseException: {}", e.getMessage());
         return ResponseEntity.badRequest().body(e.getMessage());
     }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<String> handleException(Exception e) {
+        log.error("Exception: {}", e.getMessage());
+        return ResponseEntity.internalServerError().body("An unexpected error occurred");
+    }
 }

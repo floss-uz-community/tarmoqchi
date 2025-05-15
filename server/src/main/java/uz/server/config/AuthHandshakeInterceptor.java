@@ -1,6 +1,7 @@
 package uz.server.config;
 
 import java.util.Map;
+
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.stereotype.Component;
@@ -18,9 +19,14 @@ public class AuthHandshakeInterceptor implements HandshakeInterceptor {
         Map<String, Object> attributes
     ) {
         String authHeader = request.getHeaders().getFirst("Authorization");
+        String customSubdomain = request.getHeaders().getFirst("Custom-Subdomain");
 
         if (authHeader != null) {
             attributes.put("Authorization", authHeader);
+        }
+
+        if (customSubdomain != null){
+            attributes.put("Custom-Subdomain", customSubdomain);
         }
 
         return true;

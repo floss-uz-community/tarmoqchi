@@ -12,4 +12,6 @@ public interface TunnelRepository extends JpaRepository<Tunnel, Long> {
     Optional<Tunnel> findBySubdomainIgnoreCase(String subdomain);
 
     Optional<Tunnel> findBySessionId(String id);
+
+    boolean existsBySubdomain(String customSubdomain);
 }

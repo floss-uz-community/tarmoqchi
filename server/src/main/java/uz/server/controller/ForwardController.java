@@ -11,7 +11,7 @@ import uz.server.domain.exception.BaseException;
 import uz.server.domain.model.ForwardInfo;
 import uz.server.domain.model.Request;
 import uz.server.domain.model.Response;
-import uz.server.ws.Forwarder;
+import uz.server.ws.EventManager;
 
 import java.io.IOException;
 import java.util.Enumeration;
@@ -23,7 +23,7 @@ import java.util.Objects;
 @RestController
 @RequiredArgsConstructor
 public class ForwardController {
-    private final Forwarder forwarder;
+    private final EventManager eventManager;
 
     @RequestMapping(value = "/**", headers = {"Upgrade!=websocket"})
     public ResponseEntity<String> handleRequest(
@@ -56,7 +56,7 @@ public class ForwardController {
 
         log.info("Forwarding [{}] request to path: [{}], domain[{}]", method, requestUri, subdomain);
 
-        Response response = forwarder.forward(subdomain, Request.builder()
+        Response response = eventManager.sendRequestToAgent(subdomain, Request.builder()
                 .forwardInfo(ForwardInfo.builder()
                         .headers(headers)
                         .body(body)
