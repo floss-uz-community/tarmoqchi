@@ -20,7 +20,7 @@ import (
 const (
 	wsDomain   = "wss://tarmoqchi.uz/server"
 	httpDomain = "https://tarmoqchi.uz"
-	version    = "Tarmoqchi CLI v2.0.0"
+	version    = "Tarmoqchi CLI v2.0.1"
 )
 
 // RequestType enum
@@ -302,9 +302,6 @@ func createTunnel(port string, customSubdomain string) {
 			_, message, err := c.ReadMessage()
 
 			if err != nil {
-				if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
-					printError("Connection closed")
-				}
 				return
 			}
 
