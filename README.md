@@ -45,6 +45,7 @@ Replace `YOUR_SUBDOMAIN` with the desired subdomain name. For example:
 ```
 tarmoqchi --port 8080 --sd mycustomsubdomain
 ```
+<b>You can stop the tunnel by pressing `Ctrl + C` in the terminal.</b>
 
 ---
 
