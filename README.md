@@ -2,8 +2,6 @@
 
 <h2 align="center">Tarmoqchi - The HTTP Tunneling Tool</h2>
 
----
-
 ### Feature Overview
 - Expose your local server to the internet easily.
 - Access your local services from anywhere.
