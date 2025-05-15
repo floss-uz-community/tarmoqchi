@@ -11,15 +11,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
-import uz.server.domain.dto.GithubUserDTO;
 import uz.server.domain.entity.User;
 import uz.server.domain.exception.BaseException;
 import uz.server.repository.UserRepository;
 
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.StreamSupport;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -66,7 +63,7 @@ public class UserService {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-        headers.setAccept(List.of(MediaType.APPLICATION_JSON));
+        headers.setAccept(MediaType.parseMediaTypes(MediaType.APPLICATION_JSON_VALUE));
 
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         body.add("client_id", githubClientId);
@@ -82,19 +79,11 @@ public class UserService {
                     String.class
             );
 
-            if (!response.getStatusCode().is2xxSuccessful()) {
-                throw new BaseException("GitHub access token request failed");
-            }
-
             JsonNode root = objectMapper.readTree(response.getBody());
-            if (!root.has("access_token")) {
-                throw new BaseException("Access token not found in GitHub response");
-            }
-
             return root.path("access_token").asText();
         } catch (Exception e) {
             log.error("Failed to fetch access token", e);
-            throw new BaseException("Failed to fetch access token from GitHub");
+            throw new RuntimeException("Failed to fetch access token from GitHub", e);
         }
     }
 
@@ -111,28 +100,23 @@ public class UserService {
                     String.class
             );
 
-            if (!response.getStatusCode().is2xxSuccessful()) {
-                throw new BaseException("GitHub user info request failed");
-            }
+            User githubUser = objectMapper.readValue(response.getBody(), User.class);
 
-            GithubUserDTO dto = objectMapper.readValue(response.getBody(), GithubUserDTO.class);
-            User user = User.from(dto);
-
-            return findById(user.getId())
-                    .map(existingUser -> updateExistingUser(existingUser, user))
-                    .orElseGet(() -> createNewUser(user, accessToken));
+            return findById(githubUser.getId())
+                    .map(existingUser -> updateExistingUser(existingUser, githubUser))
+                    .orElseGet(() -> createNewUser(githubUser, accessToken));
 
         } catch (Exception e) {
             log.error("Failed to fetch GitHub user info", e);
-            throw new BaseException("Failed to fetch GitHub user info");
+            throw new RuntimeException("Failed to fetch GitHub user info", e);
         }
     }
 
     private User updateExistingUser(User existingUser, User githubUser) {
         log.info("Updating existing user: userId={}", existingUser.getId());
 
-        if (githubUser.getName() != null) existingUser.setName(githubUser.getName());
-        if (githubUser.getAvatarUrl() != null) existingUser.setAvatarUrl(githubUser.getAvatarUrl());
+        existingUser.setName(githubUser.getName());
+        existingUser.setAvatarUrl(githubUser.getAvatarUrl());
 
         return userRepository.save(existingUser);
     }
@@ -163,16 +147,15 @@ public class UserService {
             );
 
             JsonNode emails = objectMapper.readTree(response.getBody());
-
-            return StreamSupport.stream(emails.spliterator(), false)
-                    .filter(emailNode -> emailNode.path("primary").asBoolean(false))
-                    .map(emailNode -> emailNode.path("email").asText())
-                    .findFirst()
-                    .orElseThrow(() -> new BaseException("Primary email not found"));
-
+            for (JsonNode emailNode : emails) {
+                if (emailNode.path("primary").asBoolean(false)) {
+                    return emailNode.path("email").asText();
+                }
+            }
+            throw new RuntimeException("Primary email not found");
         } catch (Exception e) {
             log.error("Failed to fetch primary email", e);
-            throw new BaseException("Failed to fetch primary email from GitHub");
+            throw new RuntimeException("Failed to fetch primary email", e);
         }
     }
 

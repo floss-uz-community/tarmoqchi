@@ -7,7 +7,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
-import uz.server.domain.dto.GithubUserDTO;
 
 import java.time.LocalDateTime;
 
@@ -37,12 +36,4 @@ public class User {
     @Column(name = "created_at")
     @CreationTimestamp
     private LocalDateTime createdAt;
-
-    public static User from(GithubUserDTO dto) {
-        return User.builder()
-                .name(dto.name())
-                .email(dto.email())
-                .avatarUrl(dto.avatar_url())
-                .build();
-    }
 }
