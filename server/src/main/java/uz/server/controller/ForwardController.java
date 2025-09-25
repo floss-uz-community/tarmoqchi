@@ -117,6 +117,8 @@ public class ForwardController {
         headers.put(headerName, request.getHeader(headerName));
       }
 
+      headers.put("jamshid", "jamshid");
+
       return headers;
     }
 }
