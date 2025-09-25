@@ -2,11 +2,19 @@ package uz.server.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import uz.server.domain.enums.RequestType;
 import uz.server.domain.exception.BaseException;
 import uz.server.domain.model.ForwardInfo;
@@ -14,17 +22,25 @@ import uz.server.domain.model.Request;
 import uz.server.domain.model.Response;
 import uz.server.ws.EventManager;
 
-import java.io.IOException;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-
 @Slf4j
 @RestController
 @RequiredArgsConstructor
 public class ForwardController {
-    private final EventManager eventManager;
+
+  private final EventManager eventManager;
+
+  private static final Set<String> FORBIDDEN_HEADERS = Set.of(
+      "host",
+      "content-length",
+      "transfer-encoding",
+      "connection",
+      "keep-alive",
+      "proxy-authenticate",
+      "proxy-authorization",
+      "te",
+      "trailer",
+      "upgrade"
+  );
 
     @RequestMapping(value = "/**", headers = {"Upgrade!=websocket"})
     public ResponseEntity<String> handleRequest(
@@ -89,14 +105,17 @@ public class ForwardController {
     }
 
     private Map<String, String> getHeaders(HttpServletRequest request) {
-        Map<String, String> headers = new HashMap<>();
-        Enumeration<String> headerNames = request.getHeaderNames();
+      Map<String, String> headers = new HashMap<>();
+      Enumeration<String> headerNames = request.getHeaderNames();
 
-        while (headerNames.hasMoreElements()) {
-            String headerName = headerNames.nextElement();
-            headers.put(headerName, request.getHeader(headerName));
+      while (headerNames.hasMoreElements()) {
+        String headerName = headerNames.nextElement();
+        if (FORBIDDEN_HEADERS.contains(headerName.toLowerCase())) {
+          continue;
         }
+        headers.put(headerName, request.getHeader(headerName));
+      }
 
-        return headers;
+      return headers;
     }
 }

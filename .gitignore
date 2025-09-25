@@ -6,6 +6,8 @@
 /server/mvnw
 /server/mvnw.cmd
 
+.idea/
+
 # Project exclude paths
 /out/
 

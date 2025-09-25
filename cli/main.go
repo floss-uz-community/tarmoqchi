@@ -10,10 +10,10 @@ import (
 	"os"
 	"os/signal"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"sync"
 	"time"
-	"regexp"
 
 	"github.com/gorilla/websocket"
 )
@@ -21,10 +21,9 @@ import (
 const (
 	wsDomain   = "wss://tarmoqchi.uz/server"
 	httpDomain = "https://tarmoqchi.uz"
-	version    = "Tarmoqchi CLI v2.0.2"
+	version    = "Tarmoqchi CLI v2.1.0"
 )
 
-// RequestType enum
 type RequestType string
 
 type ResponseType string
@@ -39,14 +38,13 @@ const (
 	ResponseChunk         ResponseType = "RESPONSE_CHUNK"
 )
 
-// ForwardInfo represents forwarding information
 type ForwardInfo struct {
 	Path   string `json:"path"`
 	Method string `json:"method"`
 	Body   string `json:"body,omitempty"`
+	Headers map[string]string `json:"headers,omitempty"`
 }
 
-// TunnelInfo represents tunnel information
 type TunnelInfo struct {
 	Message string `json:"message"`
 }
@@ -68,7 +66,6 @@ type Request struct {
 	Error       string       `json:"error,omitempty"`
 }
 
-// WebSocketManager handles safe writing to WebSocket
 type WebSocketManager struct {
 	conn      *websocket.Conn
 	writeChan chan []byte
@@ -76,22 +73,19 @@ type WebSocketManager struct {
 	wg        sync.WaitGroup
 }
 
-// NewWebSocketManager creates a new WebSocket manager
 func NewWebSocketManager(conn *websocket.Conn) *WebSocketManager {
 	wsm := &WebSocketManager{
 		conn:      conn,
-		writeChan: make(chan []byte, 100), // Buffer size can be adjusted
+		writeChan: make(chan []byte, 100),
 		closeChan: make(chan struct{}),
 	}
 
-	// Start the writer goroutine
 	wsm.wg.Add(1)
 	go wsm.writerLoop()
 
 	return wsm
 }
 
-// writerLoop handles all writes to the WebSocket
 func (wsm *WebSocketManager) writerLoop() {
 	defer wsm.wg.Done()
 
@@ -109,31 +103,25 @@ func (wsm *WebSocketManager) writerLoop() {
 	}
 }
 
-// Write sends a message to be written to the WebSocket
 func (wsm *WebSocketManager) Write(message []byte) {
 	select {
-	case wsm.writeChan <- message:
-		// Message sent to channel
-	case <-wsm.closeChan:
-		// Manager is closed
+    case wsm.writeChan <- message:
+    case <-wsm.closeChan:
 	}
 }
 
-// WritePing sends a ping message to the WebSocket
 func (wsm *WebSocketManager) WritePing() error {
 	return wsm.conn.WriteMessage(websocket.PingMessage, []byte("ping"))
 }
 
-// WriteClose sends a close message to the WebSocket
 func (wsm *WebSocketManager) WriteClose(closeCode int, text string) error {
 	return wsm.conn.WriteMessage(websocket.CloseMessage,
 		websocket.FormatCloseMessage(closeCode, text))
 }
 
-// Close shuts down the WebSocket manager
 func (wsm *WebSocketManager) Close() {
 	close(wsm.closeChan)
-	wsm.wg.Wait() // Wait for writer goroutine to finish
+	wsm.wg.Wait()
 }
 
 func main() {
@@ -143,10 +131,8 @@ func main() {
 	versionFlag := flag.Bool("version", false, "Show version information")
 	customSubdomainFlag := flag.String("sd", "", "Custom subdomain for the tunnel")
 
-	// Parse command line arguments
 	flag.Parse()
 
-	// Check for help or version flags
 	if *helpFlag {
 		printHelp()
 		return
@@ -213,7 +199,6 @@ func authorize(auth string) {
 	defer resp.Body.Close()
 
 	if resp.StatusCode == 200 {
-		// Create directory if it doesn't exist
 		homeDir, err := os.UserHomeDir()
 		if err != nil {
 			printError("Failed to get home directory: " + err.Error())
@@ -227,7 +212,6 @@ func authorize(auth string) {
 			return
 		}
 
-		// Save token to file
 		tokenPath := filepath.Join(tokenDir, "token")
 		err = os.WriteFile(tokenPath, []byte(auth), 0600)
 		if err != nil {
@@ -246,7 +230,6 @@ func createTunnel(port string, customSubdomain string) {
 	printTarmoqchi()
 	printInfo("Attempting to establish a tunnel...")
 
-	// Get token from file
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
 		printError("Failed to get home directory: " + err.Error())
@@ -262,7 +245,6 @@ func createTunnel(port string, customSubdomain string) {
 
 	token := strings.TrimSpace(string(tokenBytes))
 
-	// Create header for WebSocket connection
 	header := http.Header{}
 	header.Add("Authorization", "Bearer "+token)
 
@@ -280,17 +262,14 @@ func createTunnel(port string, customSubdomain string) {
 		header.Add("Custom-Subdomain", customSubdomain)
 	}
 
-	// Connect to WebSocket
 	c, _, err := websocket.DefaultDialer.Dial(wsDomain, header)
 	if err != nil {
 		printError("Error connecting to the server: " + err.Error())
 		return
 	}
 
-	// Create WebSocketManager for safe concurrent writes
 	wsManager := NewWebSocketManager(c)
 
-	// Ensure resources are cleaned up properly
 	defer func() {
 		wsManager.Close()
 		c.Close()
@@ -298,18 +277,14 @@ func createTunnel(port string, customSubdomain string) {
 
 	printWarning("The tunnel will automatically close in 4 hours.")
 
-	// Setup ping ticker
 	ticker := time.NewTicker(30 * time.Second)
 	defer ticker.Stop()
 
-	// Setup signal handling for graceful shutdown
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, os.Interrupt)
 
-	// Create a done channel to signal when to exit
 	done := make(chan struct{})
 
-	// Read messages from server
 	go func() {
 		defer close(done)
 		for {
@@ -350,13 +325,11 @@ func createTunnel(port string, customSubdomain string) {
 		}
 	}()
 
-	// Main loop
 	for {
 		select {
 		case <-done:
 			return
 		case <-ticker.C:
-			// Send ping message
 			err := wsManager.WritePing()
 			if err != nil {
 				printError("Failed to send ping: " + err.Error())
@@ -365,17 +338,15 @@ func createTunnel(port string, customSubdomain string) {
 		case <-interrupt:
 			printWarning("Tarmoqchi is off, thank you for using")
 
-			// Cleanly close the connection by sending a close message
 			err := wsManager.WriteClose(websocket.CloseNormalClosure, "")
 			if err != nil {
 				printError("Error during closing websocket: " + err.Error())
 				return
 			}
 
-			// Wait for the server to close the connection
 			select {
-			case <-done:
-			case <-time.After(time.Second):
+        case <-done:
+        case <-time.After(time.Second):
 			}
 			return
 		case <-time.After(4 * time.Hour):
@@ -387,27 +358,28 @@ func createTunnel(port string, customSubdomain string) {
 
 func requestSender(request *Request, wsManager *WebSocketManager, localPort string) {
 	forwardInfo := request.ForwardInfo
-	targetURL := fmt.Sprintf("http://localhost:%s%s", localPort, forwardInfo.Path)
+  targetURL := fmt.Sprintf("http://127.0.0.1:%s%s", localPort, forwardInfo.Path)
 
-	// Create HTTP client and request
-	client := &http.Client{}
-	var reqBody io.Reader
+  client := &http.Client{}
+  var reqBody io.Reader
 
-	if forwardInfo.Body != "" {
-		reqBody = strings.NewReader(forwardInfo.Body)
-	}
+  if forwardInfo.Body != "" {
+  	reqBody = strings.NewReader(forwardInfo.Body)
+  }
 
-	req, err := http.NewRequest(forwardInfo.Method, targetURL, reqBody)
-	if err != nil {
-		printError("Error creating request: " + err.Error())
-		return
-	}
+  req, err := http.NewRequest(forwardInfo.Method, targetURL, reqBody)
+  if err != nil {
+  	printError("Error creating request: " + err.Error())
+  	return
+  }
 
-	// Set default headers
-	req.Header.Set("User-Agent", "Go HttpClient Bot")
-	req.Header.Set("Accept", "*/*")
+  req.Header.Set("User-Agent", "Go HttpClient Bot")
+  req.Header.Set("Accept", "*/*")
 
-	// Send the request
+  for k, v := range forwardInfo.Headers {
+  	req.Header.Set(k, v)
+  }
+
 	resp, err := client.Do(req)
 
 	if err != nil {
@@ -438,7 +410,6 @@ func requestSender(request *Request, wsManager *WebSocketManager, localPort stri
 
 	defer resp.Body.Close()
 
-	// Read response body
 	bodyBytes, err := io.ReadAll(resp.Body)
 
 	if err != nil {
@@ -481,11 +452,9 @@ func requestSender(request *Request, wsManager *WebSocketManager, localPort stri
 				return
 			}
 
-			// Use WebSocketManager for thread-safe writing
 			wsManager.Write(responseJSON)
 		}
 	} else {
-		// Send response as usual for small payloads
 		response := Response{
 			ID:           request.ID,
 			StatusCode:   resp.StatusCode,
@@ -502,7 +471,6 @@ func requestSender(request *Request, wsManager *WebSocketManager, localPort stri
 			return
 		}
 
-		// Use WebSocketManager for thread-safe writing
 		wsManager.Write(responseJSON)
 	}
 }
@@ -511,13 +479,12 @@ func flattenHeaders(h http.Header) map[string]string {
 	flat := make(map[string]string)
 	for key, values := range h {
 		if len(values) > 0 {
-			flat[key] = values[0] // faqat birinchi qiymatini olamiz
+			flat[key] = values[0]
 		}
 	}
 	return flat
 }
 
-// Print functions
 func printError(msg string) {
 	fmt.Println("[ERROR] " + msg)
 }
