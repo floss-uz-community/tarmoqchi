@@ -47,9 +47,7 @@ public class TunnelService {
     }
 
     private String generateUniqueString() {
-      long timestamp = System.currentTimeMillis();
       StringBuilder sb = new StringBuilder();
-      sb.append(timestamp);
 
       for (int i = 0; i < 8; i++) {
         sb.append(CHARACTERS.charAt(RANDOM.nextInt(CHARACTERS.length())));
