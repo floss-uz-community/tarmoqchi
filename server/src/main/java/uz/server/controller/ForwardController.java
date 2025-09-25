@@ -37,6 +37,7 @@ public class ForwardController {
       "keep-alive",
       "proxy-authenticate",
       "proxy-authorization",
+      "accept-encoding",
       "te",
       "trailer",
       "upgrade"
