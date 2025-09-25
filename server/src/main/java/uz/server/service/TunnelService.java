@@ -1,5 +1,8 @@
 package uz.server.service;
 
+import java.security.SecureRandom;
+import java.util.Objects;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -9,15 +12,14 @@ import uz.server.domain.entity.User;
 import uz.server.domain.exception.BaseException;
 import uz.server.repository.TunnelRepository;
 
-import java.security.SecureRandom;
-import java.util.Objects;
-import java.util.Optional;
-
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class TunnelService {
     private final TunnelRepository repo;
+
+    private static final SecureRandom RANDOM = new SecureRandom();
+    private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
     public String create(String sessionId, User user, String customSubdomain) {
         log.info("Creating tunnel: userId={}", user.getId());
@@ -45,18 +47,15 @@ public class TunnelService {
     }
 
     private String generateUniqueString() {
-        long timestamp = System.currentTimeMillis() % 100000;
-        StringBuilder sb = new StringBuilder();
-        SecureRandom RANDOM = new SecureRandom();
+      long timestamp = System.currentTimeMillis();
+      StringBuilder sb = new StringBuilder();
+      sb.append(timestamp);
 
-        sb.append(timestamp);
+      for (int i = 0; i < 8; i++) {
+        sb.append(CHARACTERS.charAt(RANDOM.nextInt(CHARACTERS.length())));
+      }
 
-        for (int i = 0; i < 8; i++) {
-            String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-            sb.append(CHARACTERS.charAt(RANDOM.nextInt(CHARACTERS.length())));
-        }
-
-        return sb.toString();
+      return sb.toString();
     }
 
     public void deactivate(Long tunnelId) {
