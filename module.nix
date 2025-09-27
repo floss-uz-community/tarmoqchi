@@ -342,7 +342,7 @@ in {
       dataDir = mkOption {
         type = types.str;
         default = "/var/lib/tarmoqchi";
-        description = lib.mdDoc ''
+        description = ''
           The path where tarmoqchi keeps its config, data, and logs.
         '';
       };
