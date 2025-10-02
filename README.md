@@ -19,6 +19,15 @@ curl -fsSL https://github.com/floss-uz-community/tarmoqchi/releases/download/Tar
 ```
 </details>
 <details>
+<summary>Arch linux AUR</summary>
+
+```
+paru -S tarmoqchi
+or
+yay -S tarmoqchi
+```
+</details>
+<details>
 <summary>Windows</summary>
 Download the latest exe from the [release page](https://github.com/floss-uz-community/tarmoqchi/releases/tag/Tarmoqchi-2.0.0)
 </details>
