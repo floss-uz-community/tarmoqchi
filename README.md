@@ -15,7 +15,7 @@
 <summary>macOS and linux</summary>
 
 ```
-curl -fsSL https://github.com/jamshid-elmurodov/tarmoqchi/releases/download/Tarmoqchi-2.0.0/install.sh | sudo bash
+curl -fsSL https://github.com/floss-uz-community/tarmoqchi/releases/download/Tarmoqchi-2.0.0/install.sh | sudo bash
 ```
 </details>
 <details>
