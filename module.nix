@@ -91,7 +91,6 @@ flake: {
     # Configurator service (before actual server)
     systemd.services."tarmoqchi-config" = {
       wantedBy = ["tarmoqchi.target"];
-      partOf = ["tarmoqchi.target"];
       path = with pkgs; [
         jq
         openssl

@@ -27,21 +27,21 @@ import uz.server.ws.EventManager;
 @RequiredArgsConstructor
 public class ForwardController {
 
-  private final EventManager eventManager;
+    private final EventManager eventManager;
 
-  private static final Set<String> FORBIDDEN_HEADERS = Set.of(
-      "host",
-      "content-length",
-      "transfer-encoding",
-      "connection",
-      "keep-alive",
-      "proxy-authenticate",
-      "proxy-authorization",
-      "accept-encoding",
-      "te",
-      "trailer",
-      "upgrade"
-  );
+    private static final Set<String> FORBIDDEN_HEADERS = Set.of(
+        "host",
+        "content-length",
+        "transfer-encoding",
+        "connection",
+        "keep-alive",
+        "proxy-authenticate",
+        "proxy-authorization",
+        "accept-encoding",
+        "te",
+        "trailer",
+        "upgrade"
+    );
 
     @RequestMapping(value = "/**", headers = {"Upgrade!=websocket"})
     public ResponseEntity<String> handleRequest(
@@ -88,6 +88,11 @@ public class ForwardController {
 
         HttpHeaders httpHeaders = new HttpHeaders();
         response.getHeaders().forEach(httpHeaders::add);
+      httpHeaders.set("Access-Control-Allow-Origin", "*");
+      httpHeaders.set("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
+      httpHeaders.set("Access-Control-Allow-Headers", "*");
+      httpHeaders.set("Access-Control-Allow-Credentials", "true");
+
         return ResponseEntity.status(response.getStatus()).headers(httpHeaders).body(response.getBody());
     }
 
