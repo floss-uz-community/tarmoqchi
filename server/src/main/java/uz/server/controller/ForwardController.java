@@ -88,11 +88,6 @@ public class ForwardController {
 
         HttpHeaders httpHeaders = new HttpHeaders();
         response.getHeaders().forEach(httpHeaders::add);
-      httpHeaders.set("Access-Control-Allow-Origin", "*");
-      httpHeaders.set("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
-      httpHeaders.set("Access-Control-Allow-Headers", "*");
-      httpHeaders.set("Access-Control-Allow-Credentials", "true");
-
         return ResponseEntity.status(response.getStatus()).headers(httpHeaders).body(response.getBody());
     }
 
