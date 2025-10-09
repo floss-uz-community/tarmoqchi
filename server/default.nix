@@ -9,7 +9,7 @@ in
     inherit version;
 
     src = ./.;
-    mvnHash = "sha256-+hGWYg46ai+IuSxM8MwT4j+BEqOjd6HM3gbgtlkx0Bw=";
+    mvnHash = "sha256-Hjs7qpaqRf8N+hVMJNaM0Oli1pY0K5Xcegi20gPhpA0=";
 
     nativeBuildInputs = with pkgs; [
       makeWrapper
