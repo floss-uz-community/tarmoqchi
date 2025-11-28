@@ -117,7 +117,7 @@ public class EventManager {
         sender.send(tunnel.getSessionId(), utils.parseToJson(request));
 
         try {
-            return future.get(30, TimeUnit.SECONDS);
+            return future.get(60, TimeUnit.SECONDS);
         } catch (TimeoutException | InterruptedException | ExecutionException e) {
             throw new BaseException(Settings.TIMEOUT_HTML);
         } finally {

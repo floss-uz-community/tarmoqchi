@@ -62,7 +62,7 @@ public class Settings {
                    <body>
             
                      <div class="container">
-                       <h1>Connection Timeout after 45 seconds</h1>
+                       <h1>Connection Timeout after 60 seconds</h1>
                        <p>It seems the connection has timed out.</p>
                        <p>Please check your network settings or try again later.</p>
                        <a href="https://tarmoqchi.uz">Go to Tarmoqchi</a>

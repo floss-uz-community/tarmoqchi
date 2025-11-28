@@ -76,7 +76,7 @@ type WebSocketManager struct {
 func NewWebSocketManager(conn *websocket.Conn) *WebSocketManager {
 	wsm := &WebSocketManager{
 		conn:      conn,
-		writeChan: make(chan []byte, 100),
+		writeChan: make(chan []byte, 500),
 		closeChan: make(chan struct{}),
 	}
 
@@ -262,7 +262,13 @@ func createTunnel(port string, customSubdomain string) {
 		header.Add("Custom-Subdomain", customSubdomain)
 	}
 
-	c, _, err := websocket.DefaultDialer.Dial(wsDomain, header)
+	dialer := websocket.Dialer{
+		ReadBufferSize:  10 * 1024 * 1024,  // 10MB
+		WriteBufferSize: 10 * 1024 * 1024,  // 10MB
+		HandshakeTimeout: 45 * time.Second,
+	}
+
+	c, _, err := dialer.Dial(wsDomain, header)
 	if err != nil {
 		printError("Error connecting to the server: " + err.Error())
 		return
@@ -360,7 +366,9 @@ func requestSender(request *Request, wsManager *WebSocketManager, localPort stri
 	forwardInfo := request.ForwardInfo
   targetURL := fmt.Sprintf("http://127.0.0.1:%s%s", localPort, forwardInfo.Path)
 
-  client := &http.Client{}
+  client := &http.Client{
+  	Timeout: 60 * time.Second,
+  }
   var reqBody io.Reader
 
   if forwardInfo.Body != "" {
@@ -422,7 +430,7 @@ func requestSender(request *Request, wsManager *WebSocketManager, localPort stri
 	currentTime := time.Now().Format("15:04:05")
 	fmt.Println(fmt.Sprintf("[%s] %s %d %s", currentTime, forwardInfo.Method, resp.StatusCode, forwardInfo.Path))
 
-	const chunkSize = 500000
+	const chunkSize = 10000000
 
 	if len(responseBody) > chunkSize {
 		for len(responseBody) > 0 {
