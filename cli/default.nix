@@ -11,9 +11,13 @@ in
 
     vendorHash = "sha256-0Qxw+MUYVgzgWB8vi3HBYtVXSq/btfh4ZfV/m1chNrA=";
 
+    postInstall = ''
+      mv $out/bin/cli $out/bin/tarmoqchi
+    '';
+
     meta = with lib; {
       homepage = "https://tarmoqchi.uz";
-      mainProgram = "cli";
+      mainProgram = "tarmoqchi";
       description = "HTTP & TCP tunnelling";
       license = with lib.licenses; [mit];
       platforms = with platforms; linux ++ darwin;
