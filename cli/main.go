@@ -37,6 +37,7 @@ const (
 const (
 	NotRunningAppOfClient ResponseType = "NOT_RUNNING_APP_OF_CLIENT"
 	ResponseChunk         ResponseType = "RESPONSE_CHUNK"
+	ResponseChunkBase64   ResponseType = "RESPONSE_CHUNK_BASE64"
 )
 
 type ForwardInfo struct {
@@ -451,7 +452,7 @@ func requestSender(request *Request, wsManager *WebSocketManager, localPort stri
 				StatusCode:   resp.StatusCode,
 				Body:         chunk,
 				Last:         last,
-				ResponseType: ResponseChunk,
+				ResponseType: ResponseChunkBase64,
 				Headers:      flattenHeaders(resp.Header),
 			}
 
@@ -469,7 +470,7 @@ func requestSender(request *Request, wsManager *WebSocketManager, localPort stri
 			StatusCode:   resp.StatusCode,
 			Body:         responseBody,
 			Last:         true,
-			ResponseType: ResponseChunk,
+			ResponseType: ResponseChunkBase64,
 			Headers:      flattenHeaders(resp.Header),
 		}
 

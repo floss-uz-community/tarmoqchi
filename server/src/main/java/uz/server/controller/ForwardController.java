@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uz.server.domain.enums.RequestType;
+import uz.server.domain.enums.ResponseType;
 import uz.server.domain.exception.BaseException;
 import uz.server.domain.model.ForwardInfo;
 import uz.server.domain.model.Request;
@@ -94,7 +95,13 @@ public class ForwardController {
       httpHeaders.set("Access-Control-Allow-Headers", "*");
       httpHeaders.set("Access-Control-Allow-Credentials", "true");
 
-        byte[] responseBody = Base64.getDecoder().decode(response.getBody());
+        byte[] responseBody;
+
+        if (response.getResponseType() == ResponseType.RESPONSE_CHUNK_BASE64) {
+            responseBody = Base64.getDecoder().decode(response.getBody());
+        } else {
+            responseBody = response.getBody() != null ? response.getBody().getBytes() : new byte[0];
+        }
 
         return ResponseEntity.status(response.getStatus()).headers(httpHeaders).body(responseBody);
     }
