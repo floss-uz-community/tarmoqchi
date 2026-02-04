@@ -3,6 +3,7 @@ package uz.server.controller;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Base64;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
@@ -44,7 +45,7 @@ public class ForwardController {
     );
 
     @RequestMapping(value = "/**", headers = {"Upgrade!=websocket"})
-    public ResponseEntity<String> handleRequest(
+    public ResponseEntity<byte[]> handleRequest(
             @RequestBody(required = false) String body,
             HttpServletRequest servletRequest,
             HttpServletResponse servletResponse) {
@@ -56,7 +57,7 @@ public class ForwardController {
         if (subdomain.isEmpty() || Objects.equals(subdomain, "www")) {
             try {
                 servletResponse.sendRedirect("https://tarmoqchi.uz/front/");
-                return ResponseEntity.status(302).body("Redirecting...");
+                return ResponseEntity.status(302).body("Redirecting...".getBytes());
             } catch (IOException e) {
                 throw new BaseException("Error while redirecting to main page");
             }
@@ -93,7 +94,9 @@ public class ForwardController {
       httpHeaders.set("Access-Control-Allow-Headers", "*");
       httpHeaders.set("Access-Control-Allow-Credentials", "true");
 
-        return ResponseEntity.status(response.getStatus()).headers(httpHeaders).body(response.getBody());
+        byte[] responseBody = Base64.getDecoder().decode(response.getBody());
+
+        return ResponseEntity.status(response.getStatus()).headers(httpHeaders).body(responseBody);
     }
 
     private static String getSubdomain(String host) {
