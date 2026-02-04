@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"encoding/base64"
 	"flag"
 	"fmt"
 	"io"
@@ -425,7 +426,7 @@ func requestSender(request *Request, wsManager *WebSocketManager, localPort stri
 		return
 	}
 
-	responseBody := string(bodyBytes)
+	responseBody := base64.StdEncoding.EncodeToString(bodyBytes)
 
 	currentTime := time.Now().Format("15:04:05")
 	fmt.Println(fmt.Sprintf("[%s] %s %d %s", currentTime, forwardInfo.Method, resp.StatusCode, forwardInfo.Path))
