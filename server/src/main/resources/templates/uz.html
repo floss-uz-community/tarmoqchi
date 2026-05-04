@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Tarmoqchi - HTTP tunneling tool for exposing local services to the internet" />
-    <meta name="keywords" content="Tarmoqchi, HTTP tunneling, CLI tool, local server" />
-    <title>Tarmoqchi - HTTP Tunneling Tool</title>
+    <meta name="description" content="Tarmoqchi - mahalliy serveringizni internetga osongina chiqarish imkonini beruvchi vosita" />
+    <meta name="keywords" content="Tarmoqchi, HTTP tunel, CLI vosita, lokal server" />
+    <title>Tarmoqchi - HTTP tunel yaratuvchi vosita</title>
     <style>
         :root {
             --primary-color: black;
@@ -411,7 +411,7 @@
             <h1>Tarmoqchi - HTTP tunel yaratuvchi vosita</h1>
             <p>
                 Tarmoqchi mahalliy serveringizni internetga osongina chiqarish imkonini beruvchi kuchli CLI vositasidir.
-                Tarmoqchi bilan istalgan joydan mahalliy serverlaringizga kirishingiz mumkin, murakkab konfiguratsiyalar yoki boshlangʻich sozlashlarsiz.
+                Tarmoqchi bilan, murakkab konfiguratsiyalar yoki boshlangʻich sozlashlarsiz, istalgan joydan mahalliy serverlaringizga kirishingiz mumkin.
             </p>
         </section>
 
@@ -427,7 +427,7 @@
                     </button>
                 </div>
                 <div class="token-value" id="authTokenValue" th:text="${user.token}" tabindex="0">
-                    SIZNING_AUTENTIFIKATSIYA_TOKENINGGIZ
+                    SIZNING_AUTENTIFIKATSIYA_TOKENINGIZ
                 </div>
                 <p class="token-description">
                     Bu token GitHub hisobingiz bilan bogʻlanadi. Tarmoqchi CLI autentifikatsiyasidan foydalaning.
@@ -446,21 +446,21 @@
             </details>
 
             <details>
-                <summary>Windowsʼga oʻrnatish</summary>
+                <summary>Windows platformasiga oʻrnatish</summary>
                 <div>
                     <p>Oxirgi chiqqan relizni shu yerdan oʻrnating.</p>
                 </div>
             </details>
 
             <h3>Qoʻllanma</h3>
-            <p>Birinchi navbatda saytdan shaxsiy autentifikatsiya tokeninggizni oling</p>
+            <p>Birinchi navbatda saytdan shaxsiy autentifikatsiya tokeningizni oling</p>
             <pre><code>tarmoqchi --auth &lt;AUTENTIFIKATSIYA_TOKENI&gt;</code></pre>
 
-            <p>Mahalliy serveringgizni internetga chiqaring:</p>
+            <p>Mahalliy serveringizni internetga chiqaring:</p>
             <pre><code>tarmoqchi --port &lt;SIZNING_PORTINGIZ&gt;</code></pre>
 
             <p>Shuningdek, siz maxsus subdomenni ham belgilashingiz mumkin:</p>
-            <pre><code>tarmoqchi --port &lt;SIZNING_PORTINGGIZ&gt; --sd &lt;SIZNING_SUBDOMENINGGIZ&gt;</code></pre>
+            <pre><code>tarmoqchi --port &lt;SIZNING_PORTINGIZ&gt; --sd &lt;SIZNING_SUBDOMENINGIZ&gt;</code></pre>
 
             <p><strong>Tunelni CTRL + C tugmalarini bir vaqtda bosish orqali toʻxtatishingiz mumkin</strong></p>
         </section>
